@@ -12,6 +12,11 @@ class Profile(models.Model):
 
     updated_at = models.DateTimeField(auto_now=True)
 
+    email_verified = models.BooleanField(default=False)
+    verification_code = models.CharField(max_length=6, blank=True)
+    verification_sent_at = models.DateTimeField(null=True, blank=True)
+    verification_attempts = models.PositiveSmallIntegerField(default=0)
+
     def __str__(self):
         return self.user.username
 

@@ -44,7 +44,7 @@
             type="{{ field.field.widget.input_type }}"
             name="{{ field.name }}"
             value="{{ field.value|default:'' }}"
-            placeholder="{% if field.name == 'username' %}Insira o nome usuário{% elif field.name == 'email' %}Insira seu e-mail{% elif field.name == 'password' %}Insira sua senha{% elif field.name == 'confirm_password' %}Insira sua senha novamente{% elif field.name == 'first_name' %}Insira seu nome{% else %}{{ field.label }}{% endif %}"
+            placeholder="{% if field.name == 'identifier' %}Usuário ou e-mail{% elif field.name == 'password' %}Insira sua senha{% else %}{{ field.label }}{% endif %}"
             class="bg-white w-full text-black rounded-md border border-gray-200 px-4 py-3 text-sm transition-colors placeholder:text-gray-500 outline-none focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500 disabled:cursor-not-allowed disabled:opacity-50"
             autocomplete="off"
           />
@@ -77,7 +77,7 @@
 
         <form method="POST">
           {% csrf_token %}
-          <input type="hidden" name="username" value="antonio">
+          <input type="hidden" name="identifier" value="antonio">
           <input type="hidden" name="password" value="123456">
           <button
             id="loginBtn"

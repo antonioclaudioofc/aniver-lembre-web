@@ -1,0 +1,9 @@
+AniverLembre
+
+Confirme seu e-mail
+
+{% if first_name %}Olá, {{ first_name }}! {% endif %}Use o código abaixo para confirmar seu e-mail e ativar os lembretes de aniversário:
+
+{{ code }}
+
+Esse código expira em {{ ttl_minutes }} minutos. Se você não criou uma conta no AniverLembre, ignore este e-mail.

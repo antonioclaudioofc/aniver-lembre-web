@@ -5,6 +5,7 @@ from zoneinfo import ZoneInfo
 from django.conf import settings
 from django.core.mail import EmailMultiAlternatives
 from django.template.loader import render_to_string
+from django.templatetags.static import static
 from django.utils import timezone
 
 from .models import Reminder
@@ -65,6 +66,8 @@ def send_due_reminders() -> int:
             'relationship': reminder.contact.relationship,
             'days_before': reminder.days_before,
             'site_url': settings.SITE_URL,
+            'logo_url': settings.SITE_URL.rstrip('/') + '/' +
+            static('images/logo-email.png').lstrip('/'),
         }
 
         subject = f"Aniversário de {reminder.contact.name} chegando!"
