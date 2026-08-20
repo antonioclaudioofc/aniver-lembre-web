@@ -136,6 +136,10 @@ STATIC_URL = 'static/'
 STATICFILES_DIRS = [
     BASE_DIR / "base_static",
 ]
+# Required for both `collectstatic` and Vercel's automatic static asset
+# pipeline (Vercel only runs collectstatic and serves files from its CDN
+# when STATIC_ROOT is set).
+STATIC_ROOT = BASE_DIR / 'staticfiles'
 STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 
 
