@@ -11,5 +11,6 @@ class Reminder(models.Model):
     days_before = models.PositiveIntegerField()
     notify_at = models.TimeField(default='09:00')
     active = models.BooleanField(default=True)
+    last_notified_year = models.PositiveIntegerField(null=True, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)

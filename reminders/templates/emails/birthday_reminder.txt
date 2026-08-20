@@ -1,0 +1,12 @@
+AniverLembre
+
+Um aniversário está chegando!
+
+Contato: {{ contact_name }}
+Data: {{ birthday_date }}
+Fará: {{ turning }} anos
+{% if relationship %}Relação: {{ relationship }}
+{% endif %}
+Lembrete configurado para avisar {{ days_before }} dia(s) antes da data.
+
+Abrir AniverLembre: {{ site_url }}

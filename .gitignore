@@ -4,3 +4,5 @@ venv
 .env
 __pycache__
 db.sqlite3
+
+*.cpython-314.pyc

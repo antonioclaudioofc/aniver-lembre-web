@@ -25,10 +25,15 @@ load_dotenv(BASE_DIR / '.env')
 # See https://docs.djangoproject.com/en/6.0/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-up(4!6ya9x_zf4&u^f3+538c0ew&=uch0j*#w8qs7v(tt+j5tu'
+# Falls back to an insecure key only so local dev works without a .env file.
+# Production MUST set SECRET_KEY as an environment variable.
+SECRET_KEY = os.getenv(
+    'SECRET_KEY',
+    'django-insecure-up(4!6ya9x_zf4&u^f3+538c0ew&=uch0j*#w8qs7v(tt+j5tu',
+)
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = os.getenv('DEBUG', 'False') == 'True'
 
 ALLOWED_HOSTS = [".onrender.com", ".vercel.app", "127.0.0.1"]
 
@@ -143,3 +148,22 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 LOGIN_URL = '/accounts/login/'
 LOGIN_REDIRECT_URL = '/'
 LOGOUT_REDIRECT_URL = '/accounts/login/'
+
+# Email (used to send birthday reminder notifications)
+# https://docs.djangoproject.com/en/6.0/topics/email/
+EMAIL_BACKEND = os.getenv(
+    'EMAIL_BACKEND', 'django.core.mail.backends.console.EmailBackend')
+EMAIL_HOST = os.getenv('EMAIL_HOST', 'smtp.gmail.com')
+EMAIL_PORT = int(os.getenv('EMAIL_PORT', '587'))
+EMAIL_USE_TLS = os.getenv('EMAIL_USE_TLS', 'True') == 'True'
+EMAIL_HOST_USER = os.getenv('EMAIL_HOST_USER', '')
+EMAIL_HOST_PASSWORD = os.getenv('EMAIL_HOST_PASSWORD', '')
+DEFAULT_FROM_EMAIL = os.getenv('DEFAULT_FROM_EMAIL', EMAIL_HOST_USER)
+
+# Secret token required to trigger /reminders/run-check/ from an external
+# scheduler (e.g. cron-job.org). Must be set in production.
+CRON_SECRET = os.getenv('CRON_SECRET', '')
+
+# Base URL used to build links inside reminder emails (no active request
+# available when triggered by the cron endpoint).
+SITE_URL = os.getenv('SITE_URL', 'http://127.0.0.1:8000')
