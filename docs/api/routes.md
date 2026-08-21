@@ -62,3 +62,27 @@ diálogo do dashboard sempre envia os dois formulários juntos
 | Path | Descrição |
 |---|---|
 | `/admin/` | Django Admin padrão. Models registrados: `Profile`, `Contact`, `Reminder` (sem customização de `ModelAdmin` — apenas `admin.site.register(Model)`). |
+
+## Páginas de erro (404 / 500)
+
+`base_templates/404.html` e `base_templates/500.html` — descobertos
+automaticamente pelo Django por convenção de nome (`base_templates` está
+em `TEMPLATES[0]['DIRS']`, então resolvem como `404.html`/`500.html`
+puros). Nenhuma configuração extra em `urls.py` é necessária.
+
+**Só entram em ação com `DEBUG=False`.** Com `DEBUG=True` (padrão em
+desenvolvimento local), o Django sempre mostra a página técnica de debug
+(com traceback/lista de URLs), ignorando esses templates — não tem como
+ver o 404/500 "de verdade" localmente sem setar `DEBUG=False` (e
+`ALLOWED_HOSTS` compatível) temporariamente. Em produção (Vercel, com
+`DEBUG` não definido → `False` por padrão, ver
+[`environment.md`](environment.md)) eles valem normalmente.
+
+O 404 mostra um botão que muda conforme o login: "Voltar para o início"
+(`dashboard:index`) se autenticado, "Voltar para o login" se não —
+possível porque a view padrão do Django (`page_not_found`) passa
+`request` pro template, então os context processors (incluindo `user`)
+rodam normalmente. O 500 **não** tem esse luxo: a view padrão
+(`server_error`) renderiza sem `request`, então esse template evita
+qualquer coisa que dependa de context processor (`{{ user }}` não
+funcionaria lá) e só linka pra `/` direto.

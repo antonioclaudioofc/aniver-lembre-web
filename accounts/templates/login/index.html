@@ -1,7 +1,7 @@
 {% extends "global/base.html" %} {% load static %} {% block content %}
-<section class="min-h-screen grid grid-cols-2 max-lg:grid-cols-1">
+<section class="min-h-screen lg:h-screen lg:overflow-hidden grid grid-cols-2 max-lg:grid-cols-1">
   <div
-    class="ambient-panel bg-indigo-500 flex justify-center items-center flex-col gap-4 max-lg:hidden"
+    class="ambient-panel bg-indigo-500 flex justify-center items-center flex-col gap-4 max-lg:hidden lg:h-full"
   >
     <div
       class="relative w-full max-w-md h-[34rem] max-h-[70vh] cursor-grab active:cursor-grabbing touch-pan-y select-none opacity-0 animate-[fadeUp_0.6s_cubic-bezier(0.16,1,0.3,1)_0.05s_forwards] motion-reduce:animate-none motion-reduce:opacity-100"
@@ -93,7 +93,8 @@
       </div>
     </div>
   </div>
-  <div class="flex flex-col w-full items-center justify-center px-8 py-12">
+  <div class="w-full lg:h-full lg:overflow-y-auto">
+   <div class="min-h-full flex flex-col w-full items-center justify-center px-8 py-12">
     <img
       src="{% static 'images/logo.svg' %}"
       alt="AniverLembre Logo"
@@ -101,7 +102,7 @@
     />
     <div class="w-full max-w-sm">
       <h2
-        class="text-3xl lg:text-5xl font-bold text-center opacity-0 animate-[fadeUp_0.6s_cubic-bezier(0.16,1,0.3,1)_0.14s_forwards] motion-reduce:animate-none motion-reduce:opacity-100"
+        class="text-3xl lg:text-5xl font-bold text-center mt-4 mb-1 opacity-0 animate-[fadeUp_0.6s_cubic-bezier(0.16,1,0.3,1)_0.14s_forwards] motion-reduce:animate-none motion-reduce:opacity-100"
       >
         AniverLembre
       </h2>
@@ -220,6 +221,7 @@
         </a>
       </p>
     </div>
+   </div>
   </div>
 </section>
 

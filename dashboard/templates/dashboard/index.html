@@ -1,6 +1,6 @@
-{% extends "global/base.html" %} {% load static %} {% block content %}
+{% extends "global/base.html" %} {% load static dashboard_extras %} {% block content %}
 
-<nav class="w-full border-b border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-900">
+<nav class="w-full border-b border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-900 shadow-sm sticky top-0 z-40">
   <div class="max-w-7xl mx-auto p-4 flex items-center justify-between">
     <div
       class="flex items-center gap-3 cursor-pointer transitions-opcaity hover:opacity-80 text-gray-900 dark:text-gray-100"
@@ -64,27 +64,73 @@
   <div class="flex items-center justify-between mb-6 gap-3 flex-wrap">
     <div>
       <h1 class="text-3xl font-bold text-gray-900 dark:text-gray-100">Seus Lembretes</h1>
+      <p class="text-sm text-gray-500 dark:text-gray-400 mt-0.5">
+        {{ page_obj.paginator.count }} lembrete{{ page_obj.paginator.count|pluralize:"s" }}
+      </p>
     </div>
     <button
       id="openCreateDialog"
-      class="flex items-center gap-2 px-4 py-2 rounded-lg bg-indigo-600 text-white hover:bg-indigo-700 transition-colors shadow-sm"
+      class="flex items-center gap-2 px-4 py-2 rounded-lg bg-indigo-600 hover:bg-indigo-700 text-white transition duration-200 hover:-translate-y-0.5 active:translate-y-0 hover:shadow-[0_10px_20px_-8px_rgba(79,70,229,0.45)] shadow-sm motion-reduce:transition-none motion-reduce:hover:translate-y-0"
     >
       <span class="material-symbols-outlined text-lg">add_circle</span>
       Novo Lembrete
     </button>
   </div>
-  {% if reminders %}
-  <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+
+  <div class="mb-6 p-4 rounded-xl border border-gray-100 dark:border-gray-700 bg-gray-50/60 dark:bg-gray-900/30 space-y-3">
+    <form method="get" class="flex items-center gap-3">
+      <div class="relative flex-1 max-w-2xl">
+        <span class="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 dark:text-gray-500 text-xl pointer-events-none">search</span>
+        <input
+          type="text"
+          name="q"
+          value="{{ search_query }}"
+          placeholder="Buscar por nome..."
+          class="w-full pl-12 pr-4 py-3.5 rounded-lg border border-gray-300 dark:border-gray-600 shadow-sm bg-white dark:bg-gray-800 text-base text-black dark:text-white placeholder:text-gray-400 dark:placeholder:text-gray-500 outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+        />
+        {% if selected_month %}<input type="hidden" name="month" value="{{ selected_month }}" />{% endif %}
+      </div>
+      {% if search_query or selected_month %}
+      <a
+        href="{% url 'dashboard:index' %}"
+        class="flex-shrink-0 flex items-center gap-1 px-3 py-2 rounded-lg border border-red-200 dark:border-red-800 text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-950 hover:border-red-300 dark:hover:border-red-600 transition-colors text-sm font-medium whitespace-nowrap"
+      >
+        <span class="material-symbols-outlined text-base">filter_alt_off</span>
+        Limpar filtros
+      </a>
+      {% endif %}
+    </form>
+
+    <div class="flex items-center gap-2 overflow-x-auto pb-1 -mx-1 px-1">
+      <span class="flex-shrink-0 text-xs font-semibold text-gray-400 dark:text-gray-500 uppercase tracking-wide pr-1">Mês</span>
+      <a
+        href="?{{ all_months_qs }}"
+        class="flex-shrink-0 px-3 py-1.5 rounded-full text-sm font-medium border transition-colors {% if not selected_month %}bg-indigo-600 border-indigo-600 text-white{% else %}border-gray-200 dark:border-gray-700 text-gray-600 dark:text-gray-300 hover:border-indigo-300 dark:hover:border-indigo-600{% endif %}"
+        >Todos</a
+      >
+      {% for m in months %}
+      <a
+        href="?{{ m.qs }}"
+        class="flex-shrink-0 px-3 py-1.5 rounded-full text-sm font-medium border transition-colors {% if selected_month == m.number %}bg-indigo-600 border-indigo-600 text-white{% elif m.count %}border-gray-200 dark:border-gray-700 text-gray-600 dark:text-gray-300 hover:border-indigo-300 dark:hover:border-indigo-600{% else %}border-gray-100 dark:border-gray-800 text-gray-300 dark:text-gray-600 hover:border-gray-200 dark:hover:border-gray-700{% endif %}"
+        >{{ m.label }}{% if m.count %} <span class="{% if selected_month == m.number %}text-indigo-200{% else %}text-gray-400 dark:text-gray-500{% endif %}">{{ m.count }}</span>{% endif %}</a
+      >
+      {% endfor %}
+    </div>
+  </div>
+
+  {% if page_obj %}
+  <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 opacity-0 animate-[fadeUp_0.5s_cubic-bezier(0.16,1,0.3,1)_forwards] motion-reduce:animate-none motion-reduce:opacity-100">
     {% for r in reminders %}
+    {% with color=r.contact.id|avatar_color %}
     <div
-      class="group relative rounded-2xl border border-gray-100 dark:border-gray-700 shadow-sm bg-white dark:bg-gray-800 overflow-hidden"
+      class="group relative rounded-2xl border border-gray-100 dark:border-gray-700 shadow-sm bg-white dark:bg-gray-800 overflow-hidden transition-all duration-200 hover:shadow-lg hover:-translate-y-0.5 motion-reduce:transition-none motion-reduce:hover:translate-y-0"
       data-reminder-card
     >
-      <div class="absolute inset-0 bg-gradient-to-br from-indigo-50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
+      <div class="absolute inset-0 bg-gradient-to-br from-indigo-50 dark:from-indigo-950/40 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
       <div class="relative p-4 space-y-3">
         <div class="flex items-start justify-between gap-3">
           <div class="flex items-center gap-3">
-            <div class="w-10 h-10 rounded-full bg-indigo-600 text-white font-semibold flex items-center justify-center">
+            <div class="w-10 h-10 rounded-full bg-{{ color }}-600 text-white font-semibold flex items-center justify-center flex-shrink-0">
               {{ r.contact.name|slice:":1"|upper }}
             </div>
             <div>
@@ -92,11 +138,19 @@
               <p class="text-sm text-gray-600 dark:text-gray-400 flex items-center gap-1">
                 <span class="material-symbols-outlined text-base text-indigo-500">cake</span>
                 {{ r.contact.birthday|date:"d/m" }}
+                {% if r.days_until_birthday is not None %}
+                <span class="text-gray-400 dark:text-gray-500">
+                  ·
+                  {% if r.days_until_birthday == 0 %}é hoje!
+                  {% elif r.days_until_birthday == 1 %}amanhã
+                  {% else %}em {{ r.days_until_birthday }} dias{% endif %}
+                </span>
+                {% endif %}
               </p>
             </div>
           </div>
           <span
-            class="text-xs px-2 py-1 rounded-full border {{ r.active|yesno:'bg-green-50 dark:bg-green-950 text-green-700 dark:text-green-300 border-green-200 dark:border-green-800,bg-gray-50 dark:bg-gray-700 text-gray-700 dark:text-gray-300 border-gray-200 dark:border-gray-600' }}"
+            class="flex-shrink-0 text-xs px-2 py-1 rounded-full border {{ r.active|yesno:'bg-green-50 dark:bg-green-950 text-green-700 dark:text-green-300 border-green-200 dark:border-green-800,bg-gray-50 dark:bg-gray-700 text-gray-700 dark:text-gray-300 border-gray-200 dark:border-gray-600' }}"
             >{{ r.active|yesno:'Ativo,Inativo' }}</span
           >
         </div>
@@ -126,10 +180,12 @@
             </span>
             <span class="text-gray-500 dark:text-gray-400">{{ r.days_before }} dia{{ r.days_before|pluralize:"s" }} antes</span>
           </div>
-          <div class="flex items-center gap-2">
+          <div class="flex items-center gap-1.5">
             <button
               type="button"
-              class="flex items-center gap-1 px-3 py-1.5 rounded-lg border border-gray-200 dark:border-gray-600 text-gray-700 dark:text-gray-300 hover:border-indigo-200 dark:hover:border-indigo-700 hover:text-indigo-700 dark:hover:text-indigo-400 transition-colors text-sm"
+              title="Editar"
+              aria-label="Editar lembrete de {{ r.contact.name }}"
+              class="w-9 h-9 flex items-center justify-center rounded-lg border border-gray-200 dark:border-gray-600 text-gray-600 dark:text-gray-300 hover:border-indigo-300 dark:hover:border-indigo-600 hover:text-indigo-600 dark:hover:text-indigo-400 hover:bg-indigo-50 dark:hover:bg-indigo-950 transition-colors"
               data-edit-reminder
               data-reminder-id="{{ r.id }}"
               data-name="{{ r.contact.name|escape }}"
@@ -140,8 +196,7 @@
               data-notify-at="{{ r.notify_at|time:'H:i' }}"
               data-active="{{ r.active }}"
             >
-              <span class="material-symbols-outlined text-base">edit</span>
-              Editar
+              <span class="material-symbols-outlined text-lg">edit</span>
             </button>
 
             <form
@@ -150,35 +205,94 @@
               onsubmit="return confirm('Deseja excluir este lembrete?');"
             >
               {% csrf_token %}
+              <input type="hidden" name="page" value="{{ page_obj.number }}" />
               <button
                 type="submit"
-                class="flex items-center gap-1 px-3 py-1.5 rounded-lg border border-red-200 dark:border-red-800 text-red-700 dark:text-red-400 hover:border-red-300 dark:hover:border-red-600 hover:bg-red-50 dark:hover:bg-red-950 transition-colors text-sm"
+                title="Excluir"
+                aria-label="Excluir lembrete de {{ r.contact.name }}"
+                class="w-9 h-9 flex items-center justify-center rounded-lg border border-red-200 dark:border-red-800 text-red-600 dark:text-red-400 hover:border-red-300 dark:hover:border-red-600 hover:bg-red-50 dark:hover:bg-red-950 transition-colors"
               >
-                <span class="material-symbols-outlined text-base">delete</span>
-                Excluir
+                <span class="material-symbols-outlined text-lg">delete</span>
               </button>
             </form>
           </div>
         </div>
       </div>
     </div>
+    {% endwith %}
     {% endfor %}
   </div>
+
+  {% if page_obj.has_other_pages %}
+  <nav class="mt-8 flex items-center justify-center gap-1.5" aria-label="Paginação">
+    {% if page_obj.has_previous %}
+    <a
+      href="?page={{ page_obj.previous_page_number }}{{ page_qs }}"
+      class="w-9 h-9 flex items-center justify-center rounded-lg border border-gray-200 dark:border-gray-700 text-gray-600 dark:text-gray-300 hover:border-indigo-300 dark:hover:border-indigo-600 hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors"
+      aria-label="Página anterior"
+    >
+      <span class="material-symbols-outlined text-lg">chevron_left</span>
+    </a>
+    {% endif %}
+
+    {% for p in pagination_range %}
+    {% if p == None %}
+    <span class="w-9 h-9 flex items-center justify-center text-gray-400 dark:text-gray-600 select-none">…</span>
+    {% elif p == page_obj.number %}
+    <span
+      class="w-9 h-9 flex items-center justify-center rounded-lg bg-indigo-600 text-white text-sm font-semibold"
+      aria-current="page"
+      >{{ p }}</span
+    >
+    {% else %}
+    <a
+      href="?page={{ p }}{{ page_qs }}"
+      class="w-9 h-9 flex items-center justify-center rounded-lg border border-gray-200 dark:border-gray-700 text-gray-600 dark:text-gray-300 hover:border-indigo-300 dark:hover:border-indigo-600 hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors text-sm font-medium"
+      >{{ p }}</a
+    >
+    {% endif %}
+    {% endfor %}
+
+    {% if page_obj.has_next %}
+    <a
+      href="?page={{ page_obj.next_page_number }}{{ page_qs }}"
+      class="w-9 h-9 flex items-center justify-center rounded-lg border border-gray-200 dark:border-gray-700 text-gray-600 dark:text-gray-300 hover:border-indigo-300 dark:hover:border-indigo-600 hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors"
+      aria-label="Próxima página"
+    >
+      <span class="material-symbols-outlined text-lg">chevron_right</span>
+    </a>
+    {% endif %}
+  </nav>
+  {% endif %}
+
   {% else %}
-  <p class="text-gray-600 dark:text-gray-400">Você ainda não tem lembretes. Crie o primeiro!</p>
+  <div class="text-center py-16">
+    <span class="material-symbols-outlined text-5xl text-gray-300 dark:text-gray-600 mb-3 block">
+      {% if search_query or selected_month %}search_off{% else %}cake{% endif %}
+    </span>
+    {% if search_query or selected_month %}
+    <p class="text-gray-600 dark:text-gray-400 mb-1">Nenhum lembrete encontrado.</p>
+    <a href="{% url 'dashboard:index' %}" class="text-indigo-600 dark:text-indigo-400 hover:underline text-sm font-medium">Limpar filtros</a>
+    {% else %}
+    <p class="text-gray-600 dark:text-gray-400">Você ainda não tem lembretes. Crie o primeiro!</p>
+    {% endif %}
+  </div>
   {% endif %}
 </main>
 
 <dialog
   id="createDialog"
-  class="rounded-lg max-w-2xl w-5/6 p-0 backdrop:bg-black backdrop:bg-opacity-50 px-4"
+  class="rounded-2xl max-w-2xl w-5/6 p-0 backdrop:bg-black backdrop:bg-opacity-50 m-auto"
 >
-  <div class="bg-white dark:bg-gray-800 rounded-lg">
-    <div class="flex justify-between items-center px-6 py-4 border-b border-gray-200 dark:border-gray-700">
+  <div
+    id="createDialogPanel"
+    class="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl opacity-0 scale-95 transition-all duration-200 motion-reduce:transition-none motion-reduce:opacity-100 motion-reduce:scale-100 max-h-[85vh] overflow-y-auto"
+  >
+    <div class="sticky top-0 z-10 flex justify-between items-center px-6 py-4 border-b border-gray-100 dark:border-gray-700 bg-gray-50 dark:bg-gray-900/40 rounded-t-2xl">
       <h3 class="text-xl font-semibold text-gray-800 dark:text-gray-100" id="dialogTitle">{% if is_editing %}Editar Lembrete{% else %}Novo Lembrete{% endif %}</h3>
       <button
         id="closeCreateDialog"
-        class="text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-300 transition-colors"
+        class="w-9 h-9 flex items-center justify-center rounded-full text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors"
       >
         <span class="material-symbols-outlined">close</span>
       </button>
@@ -186,18 +300,21 @@
     <form
       method="post"
       action="{% url 'dashboard:create_reminder' %}"
-      class="px-6 py-4 space-y-4"
+      class="px-6 py-5 space-y-4"
     >
       {% csrf_token %}
       <input type="hidden" name="reminder_id" id="reminderIdField" value="{{ current_reminder_id|default:'' }}" />
+      <input type="hidden" name="page" value="{{ page_obj.number }}" />
 
-      <div class="space-y-4">
-        <h4
-          class="text-base font-semibold text-gray-700 dark:text-gray-300 flex items-center gap-2"
-        >
-          <span class="material-symbols-outlined text-indigo-600">person</span>
-          Informações do Contato
-        </h4>
+      <div class="space-y-4 p-4 rounded-xl bg-gray-50 dark:bg-gray-900/40 border border-gray-100 dark:border-gray-700">
+        <div class="flex items-center gap-2.5">
+          <div class="w-8 h-8 rounded-full bg-indigo-100 dark:bg-indigo-900/50 flex items-center justify-center flex-shrink-0">
+            <span class="material-symbols-outlined text-indigo-600 dark:text-indigo-400 text-lg">person</span>
+          </div>
+          <h4 class="text-base font-semibold text-gray-800 dark:text-gray-100">
+            Informações do Contato
+          </h4>
+        </div>
 
         <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <div class="flex flex-col">
@@ -255,17 +372,17 @@
         </div>
       </div>
 
-      <div class="border-t border-gray-200 dark:border-gray-700"></div>
-
-      <div class="space-y-4">
-        <h4
-          class="text-base font-semibold text-gray-700 dark:text-gray-300 flex items-center gap-2"
-        >
-          <span class="material-symbols-outlined text-indigo-600"
-            >notifications</span
-          >
-          Configurações do Lembrete
-        </h4>
+      <div class="space-y-4 p-4 rounded-xl bg-gray-50 dark:bg-gray-900/40 border border-gray-100 dark:border-gray-700">
+        <div class="flex items-center gap-2.5">
+          <div class="w-8 h-8 rounded-full bg-indigo-100 dark:bg-indigo-900/50 flex items-center justify-center flex-shrink-0">
+            <span class="material-symbols-outlined text-indigo-600 dark:text-indigo-400 text-lg"
+              >notifications</span
+            >
+          </div>
+          <h4 class="text-base font-semibold text-gray-800 dark:text-gray-100">
+            Configurações do Lembrete
+          </h4>
+        </div>
 
         <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <div class="flex flex-col">
@@ -296,13 +413,15 @@
             {% endif %}
           </div>
 
-          <div class="flex items-center gap-2 sm:col-span-2">
-            {{ reminder_form.active }}
+          <div class="flex items-center justify-between gap-2 sm:col-span-2 px-3 py-2.5 rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800">
             <label
               for="id_active"
-              class="text-sm font-medium text-gray-700 dark:text-gray-300 cursor-pointer"
-              >{{ reminder_form.active.label }}</label
+              class="text-sm font-medium text-gray-700 dark:text-gray-300 cursor-pointer flex items-center gap-2"
             >
+              <span class="material-symbols-outlined text-indigo-500 text-lg">notifications_active</span>
+              {{ reminder_form.active.label }}
+            </label>
+            {{ reminder_form.active }}
             {% if reminder_form.active.errors %}
             <div class="text-red-600 text-xs mt-1">
               {% for error in reminder_form.active.errors %}
@@ -325,7 +444,7 @@
         <button
           type="submit"
           id="saveReminderBtn"
-          class="px-6 py-2.5 rounded-lg bg-indigo-600 text-white font-semibold hover:bg-indigo-700 transition-colors flex items-center gap-2 disabled:opacity-70 disabled:cursor-not-allowed"
+          class="px-6 py-2.5 rounded-lg bg-indigo-600 hover:bg-indigo-700 text-white font-semibold transition duration-200 hover:-translate-y-0.5 active:translate-y-0 hover:shadow-[0_10px_20px_-8px_rgba(79,70,229,0.45)] flex items-center gap-2 disabled:opacity-70 disabled:cursor-not-allowed disabled:hover:translate-y-0 disabled:hover:shadow-none motion-reduce:transition-none motion-reduce:hover:translate-y-0"
         >
           <span
             class="material-symbols-outlined text-sm animate-spin hidden"
@@ -345,11 +464,32 @@
   const closeCreateBtn = document.getElementById("closeCreateDialog");
   const cancelCreateBtn = document.getElementById("cancelCreate");
 
+  const createDialogPanel = document.getElementById("createDialogPanel");
+  const prefersReducedMotion = window.matchMedia(
+    "(prefers-reduced-motion: reduce)"
+  ).matches;
+
   function openCreate() {
-    if (createDialog) createDialog.showModal();
+    if (!createDialog) return;
+    createDialog.showModal();
+    requestAnimationFrame(() => {
+      requestAnimationFrame(() => {
+        if (createDialogPanel) {
+          createDialogPanel.classList.remove("opacity-0", "scale-95");
+          createDialogPanel.classList.add("opacity-100", "scale-100");
+        }
+      });
+    });
   }
   function closeCreate() {
-    if (createDialog) createDialog.close();
+    if (!createDialog) return;
+    if (createDialogPanel && !prefersReducedMotion) {
+      createDialogPanel.classList.remove("opacity-100", "scale-100");
+      createDialogPanel.classList.add("opacity-0", "scale-95");
+      setTimeout(() => createDialog.close(), 180);
+    } else {
+      createDialog.close();
+    }
   }
 
   function resetFormToCreate() {
@@ -473,12 +613,23 @@
   }
 
   (function () {
+    const statusToasts = {
+      email_verified: ["E-mail confirmado com sucesso! Bem-vindo(a).", "success"],
+      reminder_created: ["Lembrete criado com sucesso!", "success"],
+      reminder_updated: ["Lembrete atualizado com sucesso!", "success"],
+      reminder_deleted: ["Lembrete excluído com sucesso!", "success"],
+    };
+
     const params = new URLSearchParams(window.location.search);
-    if (params.get("email_verified") !== "1") return;
+    const found = Object.keys(statusToasts).find(
+      (key) => params.get(key) === "1"
+    );
+    if (!found) return;
 
-    showAppToast("E-mail confirmado com sucesso! Bem-vindo(a).", "success");
+    const [message, type] = statusToasts[found];
+    showAppToast(message, type);
 
-    params.delete("email_verified");
+    params.delete(found);
     const newSearch = params.toString();
     const newUrl =
       window.location.pathname + (newSearch ? "?" + newSearch : "");
