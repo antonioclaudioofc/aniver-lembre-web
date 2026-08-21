@@ -1,9 +1,25 @@
 {% load static %}
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<script>
+  (function () {
+    try {
+      var stored = localStorage.getItem('theme');
+      var dark = stored
+        ? stored === 'dark'
+        : window.matchMedia('(prefers-color-scheme: dark)').matches;
+      if (dark) document.documentElement.classList.add('dark');
+    } catch (e) {}
+  })();
+</script>
 <link rel="icon" type="image/svg+xml" href="{% static 'images/logo.svg' %}" />
 <link rel="alternate icon" type="image/png" href="{% static 'images/favicon.png' %}" />
 <script src="https://cdn.tailwindcss.com"></script>
+<script>
+  tailwind.config = {
+    darkMode: 'class',
+  };
+</script>
 <link
   href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined"
   rel="stylesheet"
@@ -20,4 +36,33 @@
   href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css"
 />
 <script src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
+<script>
+  window.showAppToast = function (message, type) {
+    var palette = {
+      success: '!bg-emerald-600',
+      danger: '!bg-red-600',
+      warning: '!bg-amber-500',
+      info: '!bg-indigo-600',
+    };
+    var colorClass = palette[type] || palette.info;
+
+    if (window.__appToast) {
+      window.__appToast.hideToast();
+    }
+
+    window.__appToast = Toastify({
+      text: message,
+      duration: 3500,
+      gravity: 'top',
+      position: 'right',
+      close: true,
+      className:
+        '!bg-none ' +
+        colorClass +
+        ' !text-white !rounded-xl !shadow-2xl !px-4 !py-3 !font-medium',
+      stopOnFocus: true,
+    });
+    window.__appToast.showToast();
+  };
+</script>
 <title>Aniver Lembre</title>

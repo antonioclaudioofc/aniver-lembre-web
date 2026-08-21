@@ -1,53 +1,161 @@
 {% extends "global/base.html" %} {% load static %} {% block content %}
 <section class="min-h-screen grid grid-cols-2 max-lg:grid-cols-1">
-  <div class="bg-indigo-500 flex justify-center items-center flex-col gap-4 max-lg:hidden">
-    <img
-      src="{% static 'images/moments.svg' %}"
-      class="max-w-96 w-full max-h-[32rem]"
-      alt="Momentos"
-    />
-    <div class="max-w-96 text-center">
-      <h2 class="text-4xl font-bold mb-2 text-white">
-        Nunca esqueça um aniversário!
-      </h2>
-      <p class="text-gray-200">
-        Receba lembretes e celebre seus amigos e familiares com pontualidade.
-      </p>
+  <div
+    class="ambient-panel bg-indigo-500 flex justify-center items-center flex-col gap-4 max-lg:hidden"
+  >
+    <div
+      class="relative w-full max-w-md h-[34rem] max-h-[70vh] cursor-grab active:cursor-grabbing touch-pan-y select-none opacity-0 animate-[fadeUp_0.6s_cubic-bezier(0.16,1,0.3,1)_0.05s_forwards] motion-reduce:animate-none motion-reduce:opacity-100"
+      id="authCarousel"
+    >
+      <div
+        class="carousel-slide absolute inset-0 flex flex-col items-center justify-center gap-4 opacity-100 visible transition-opacity duration-[400ms] motion-reduce:transition-none"
+        data-slide
+      >
+        <img
+          src="{% static 'images/moments.svg' %}"
+          class="max-w-72 w-full max-h-72"
+          alt="Momentos"
+          draggable="false"
+        />
+        <div class="max-w-96 text-center">
+          <h2 class="text-4xl font-bold mb-2 text-white">
+            Nunca esqueça um aniversário!
+          </h2>
+          <p class="text-gray-200">
+            Receba lembretes e celebre seus amigos e familiares com
+            pontualidade.
+          </p>
+        </div>
+      </div>
+
+      <div
+        class="carousel-slide absolute inset-0 flex flex-col items-center justify-center gap-4 opacity-0 invisible transition-opacity duration-[400ms] motion-reduce:transition-none"
+        data-slide
+      >
+        <img
+          src="{% static 'images/organize-photos.svg' %}"
+          class="max-w-72 w-full max-h-72"
+          alt="Organize contatos"
+          draggable="false"
+        />
+        <div class="max-w-96 text-center">
+          <h2 class="text-4xl font-bold mb-2 text-white">
+            Organize seus contatos
+          </h2>
+          <p class="text-gray-200">
+            Cadastre aniversários, relação e observações de cada pessoa num só
+            lugar.
+          </p>
+        </div>
+      </div>
+
+      <div
+        class="carousel-slide absolute inset-0 flex flex-col items-center justify-center gap-4 opacity-0 invisible transition-opacity duration-[400ms] motion-reduce:transition-none"
+        data-slide
+      >
+        <div
+          class="w-36 h-36 rounded-full bg-white/15 flex items-center justify-center"
+        >
+          <span class="material-symbols-outlined text-white text-7xl"
+            >mark_email_read</span
+          >
+        </div>
+        <div class="max-w-96 text-center">
+          <h2 class="text-4xl font-bold mb-2 text-white">
+            Lembretes no seu horário
+          </h2>
+          <p class="text-gray-200">
+            Escolha quantos dias antes e a que horas quer ser avisado por
+            e-mail.
+          </p>
+        </div>
+      </div>
+
+      <div class="absolute inset-x-0 -bottom-2 flex justify-center gap-2">
+        <button
+          type="button"
+          data-dot
+          class="carousel-dot w-6 h-2 rounded-full bg-white transition-all duration-300"
+          aria-label="Slide 1"
+        ></button>
+        <button
+          type="button"
+          data-dot
+          class="carousel-dot w-2 h-2 rounded-full bg-white/40 transition-all duration-300"
+          aria-label="Slide 2"
+        ></button>
+        <button
+          type="button"
+          data-dot
+          class="carousel-dot w-2 h-2 rounded-full bg-white/40 transition-all duration-300"
+          aria-label="Slide 3"
+        ></button>
+      </div>
     </div>
   </div>
   <div class="flex flex-col w-full items-center justify-center px-8 py-12">
     <img
       src="{% static 'images/logo.svg' %}"
       alt="AniverLembre Logo"
-      class="w-[8rem] max-h-[32rem]"
+      class="w-[8rem] max-h-[32rem] opacity-0 animate-[fadeUp_0.6s_cubic-bezier(0.16,1,0.3,1)_0.05s_forwards] motion-reduce:animate-none motion-reduce:opacity-100"
     />
     <div class="w-full max-w-sm">
-      <h2 class="text-5xl font-bold text-center max-sm:text-3xl">
+      <h2
+        class="text-3xl lg:text-5xl font-bold text-center opacity-0 animate-[fadeUp_0.6s_cubic-bezier(0.16,1,0.3,1)_0.14s_forwards] motion-reduce:animate-none motion-reduce:opacity-100"
+      >
         AniverLembre
       </h2>
-      <p class="text-gray-500 text-center max-sm:text-sm mb-6">
+      <p
+        class="text-gray-500 dark:text-gray-400 text-center text-sm lg:text-base mb-6 opacity-0 animate-[fadeUp_0.6s_cubic-bezier(0.16,1,0.3,1)_0.14s_forwards] motion-reduce:animate-none motion-reduce:opacity-100"
+      >
         Preencha as informações abaixo!
       </p>
 
-      <form method="POST" class="space-y-4 w-full">
-        {% csrf_token %} {% if form.non_field_errors %}
-        <div class="bg-red-100 text-red-700 p-3 rounded-md text-sm">
-          {{ form.non_field_errors }}
-        </div>
-        {% endif %} {% for field in form %}
+      <form
+        method="POST"
+        class="space-y-4 w-full opacity-0 animate-[fadeUp_0.6s_cubic-bezier(0.16,1,0.3,1)_0.22s_forwards] motion-reduce:animate-none motion-reduce:opacity-100"
+      >
+        {% csrf_token %} {% for field in form %}
         <div class="flex flex-col">
-          <label class="mb-1 font-medium text-sm text-gray-00">
-            {{ field.label }}
-          </label>
+          <div class="flex items-center justify-between mb-1">
+            <label class="font-medium text-sm text-gray-00">
+              {{ field.label }}
+            </label>
+            {% if field.name == 'password' %}
+            <a
+              href="{% url 'accounts:password_reset_request' %}"
+              class="text-xs text-indigo-600 dark:text-indigo-400 hover:underline font-medium"
+            >
+              Esqueceu a senha?
+            </a>
+            {% endif %}
+          </div>
 
-          <input
-            type="{{ field.field.widget.input_type }}"
-            name="{{ field.name }}"
-            value="{{ field.value|default:'' }}"
-            placeholder="{% if field.name == 'identifier' %}Usuário ou e-mail{% elif field.name == 'password' %}Insira sua senha{% else %}{{ field.label }}{% endif %}"
-            class="bg-white w-full text-black rounded-md border border-gray-200 px-4 py-3 text-sm transition-colors placeholder:text-gray-500 outline-none focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500 disabled:cursor-not-allowed disabled:opacity-50"
-            autocomplete="off"
-          />
+          <div class="relative">
+            <input
+              type="{{ field.field.widget.input_type }}"
+              name="{{ field.name }}"
+              value="{{ field.value|default:'' }}"
+              placeholder="{% if field.name == 'identifier' %}Usuário ou e-mail{% elif field.name == 'password' %}Insira sua senha{% else %}{{ field.label }}{% endif %}"
+              class="bg-white dark:bg-gray-800 w-full text-black dark:text-white rounded-md border border-gray-200 dark:border-gray-700 px-4 py-3 {% if field.name == 'password' %}pr-11{% endif %} text-sm transition-colors placeholder:text-gray-500 dark:placeholder:text-gray-500 outline-none focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500 disabled:cursor-not-allowed disabled:opacity-50"
+              autocomplete="{% if field.name == 'identifier' %}username{% elif field.name == 'password' %}current-password{% endif %}"
+              id="{% if field.name == 'password' %}passwordInput{% endif %}"
+            />
+            {% if field.name == 'password' %}
+            <button
+              type="button"
+              id="togglePassword"
+              tabindex="-1"
+              class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-300 transition-colors"
+            >
+              <span
+                class="material-symbols-outlined text-xl"
+                id="togglePasswordIcon"
+                >visibility</span
+              >
+            </button>
+            {% endif %}
+          </div>
 
           {% if field.errors %}
           <p class="text-red-600 text-sm mt-1">{{ field.errors|striptags }}</p>
@@ -58,43 +166,55 @@
         <button
           type="submit"
           id="loginBtn"
-          class="w-full bg-indigo-500 hover:bg-indigo-600 text-white py-3 rounded-lg font-semibold transition disabled:opacity-70 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+          class="w-full bg-indigo-500 hover:bg-indigo-600 text-white py-3 rounded-lg font-semibold transition duration-200 hover:-translate-y-0.5 active:translate-y-0 hover:shadow-[0_10px_20px_-8px_rgba(79,70,229,0.45)] disabled:opacity-70 disabled:cursor-not-allowed disabled:hover:translate-y-0 disabled:hover:shadow-none flex items-center justify-center gap-2 motion-reduce:transition-none motion-reduce:hover:translate-y-0"
         >
-          <span class="material-symbols-outlined animate-spin hidden" id="loginSpinner">progress_activity</span>
+          <span
+            class="material-symbols-outlined animate-spin hidden"
+            id="loginSpinner"
+            >progress_activity</span
+          >
           <span id="loginText">Entrar</span>
         </button>
       </form>
 
-      <div class="mt-4">
+      <div
+        class="mt-4 opacity-0 animate-[fadeUp_0.6s_cubic-bezier(0.16,1,0.3,1)_0.3s_forwards] motion-reduce:animate-none motion-reduce:opacity-100"
+      >
         <div class="relative">
           <div class="absolute inset-0 flex items-center">
-            <div class="w-full border-t border-gray-300"></div>
+            <div class="w-full border-t border-gray-300 dark:border-gray-700"></div>
           </div>
           <div class="relative flex justify-center text-sm">
-            <span class="px-2 bg-white text-gray-500">ou</span>
+            <span class="px-2 bg-white dark:bg-gray-900 text-gray-500 dark:text-gray-400">ou</span>
           </div>
         </div>
 
         <form method="POST">
           {% csrf_token %}
-          <input type="hidden" name="identifier" value="antonio">
-          <input type="hidden" name="password" value="123456">
+          <input type="hidden" name="identifier" value="antonio" />
+          <input type="hidden" name="password" value="123456" />
           <button
-            id="loginBtn"
+            id="loginDemoBtn"
             type="submit"
-            class="mt-4 w-full bg-emerald-500 hover:bg-emerald-600 text-white py-3 rounded-lg font-semibold transition flex items-center justify-center gap-2 shadow-sm"
+            class="mt-4 w-full bg-white dark:bg-gray-800 border-2 border-emerald-500 text-emerald-600 dark:text-emerald-400 hover:bg-emerald-50 dark:hover:bg-emerald-950 py-3 rounded-lg font-semibold transition duration-200 hover:-translate-y-0.5 active:translate-y-0 flex items-center justify-center gap-2 motion-reduce:transition-none motion-reduce:hover:translate-y-0"
           >
-          <span class="material-symbols-outlined animate-spin hidden" id="loginSpinner">progress_activity</span>
+            <span
+              class="material-symbols-outlined animate-spin hidden"
+              id="loginDemoSpinner"
+              >progress_activity</span
+            >
             Entrar como Demo
           </button>
         </form>
       </div>
 
-      <p class="text-center text-sm text-gray-600 mt-4">
+      <p
+        class="text-center text-sm text-gray-600 dark:text-gray-400 mt-4 opacity-0 animate-[fadeUp_0.6s_cubic-bezier(0.16,1,0.3,1)_0.38s_forwards] motion-reduce:animate-none motion-reduce:opacity-100"
+      >
         Não possui conta?
         <a
           href="{% url 'accounts:register' %}"
-          class="text-blue-600 hover:underline font-medium"
+          class="text-blue-600 dark:text-blue-400 hover:underline font-medium"
         >
           Cadastra-se agora!
         </a>
@@ -111,12 +231,149 @@
 
   if (loginForm) {
     loginForm.addEventListener('submit', function(e) {
-      // Desabilitar botão e mostrar loader
       loginBtn.disabled = true;
       loginSpinner.classList.remove('hidden');
       loginText.textContent = 'Entrando...';
     });
   }
+
+  const loginDemoBtn = document.getElementById('loginDemoBtn');
+  const loginDemoSpinner = document.getElementById('loginDemoSpinner');
+
+  if (loginDemoBtn) {
+    loginDemoBtn.closest('form').addEventListener('submit', function () {
+      loginDemoBtn.disabled = true;
+      loginDemoSpinner.classList.remove('hidden');
+    });
+  }
+
+  const togglePasswordBtn = document.getElementById('togglePassword');
+  const passwordInput = document.getElementById('passwordInput');
+  const togglePasswordIcon = document.getElementById('togglePasswordIcon');
+
+  if (togglePasswordBtn && passwordInput) {
+    togglePasswordBtn.addEventListener('click', () => {
+      const showing = passwordInput.type === 'text';
+      passwordInput.type = showing ? 'password' : 'text';
+      togglePasswordIcon.textContent = showing ? 'visibility' : 'visibility_off';
+    });
+  }
+
+  function initCarousel(root) {
+    if (!root) return;
+
+    const slides = root.querySelectorAll('[data-slide]');
+    const dots = root.querySelectorAll('[data-dot]');
+    const prefersReducedMotion = window.matchMedia(
+      '(prefers-reduced-motion: reduce)'
+    ).matches;
+    let index = 0;
+    let timer = null;
+
+    const widthClassOf = (el) => [...el.classList].find((c) => /^w-/.test(c));
+    const activeWidthClass = dots.length ? widthClassOf(dots[0]) : null;
+    const inactiveWidthClass = dots.length > 1 ? widthClassOf(dots[1]) : null;
+
+    function show(i) {
+      index = i;
+      slides.forEach((slide, n) => {
+        const active = n === i;
+        slide.classList.toggle('opacity-100', active);
+        slide.classList.toggle('visible', active);
+        slide.classList.toggle('opacity-0', !active);
+        slide.classList.toggle('invisible', !active);
+      });
+      dots.forEach((dot, n) => {
+        const active = n === i;
+        dot.classList.toggle('bg-white', active);
+        dot.classList.toggle('bg-white/40', !active);
+        if (activeWidthClass && inactiveWidthClass) {
+          dot.classList.remove(activeWidthClass, inactiveWidthClass);
+          dot.classList.add(active ? activeWidthClass : inactiveWidthClass);
+        }
+      });
+    }
+
+    function start() {
+      if (prefersReducedMotion || slides.length < 2) return;
+      stop();
+      timer = setInterval(() => show((index + 1) % slides.length), 2000);
+    }
+
+    function stop() {
+      if (timer) clearInterval(timer);
+    }
+
+    dots.forEach((dot, n) => {
+      dot.addEventListener('click', () => {
+        show(n);
+        start();
+      });
+    });
+
+    root.addEventListener('mouseenter', stop);
+    root.addEventListener('mouseleave', start);
+
+    if (slides.length > 1) {
+      let dragging = false;
+      let startX = 0;
+      let deltaX = 0;
+      const threshold = 40;
+
+      root.addEventListener('pointerdown', (e) => {
+        dragging = true;
+        startX = e.clientX;
+        deltaX = 0;
+        stop();
+        root.setPointerCapture(e.pointerId);
+        slides[index].style.transition = 'none';
+      });
+
+      root.addEventListener('pointermove', (e) => {
+        if (!dragging) return;
+        deltaX = e.clientX - startX;
+        slides[index].style.transform = `translateX(${deltaX}px)`;
+      });
+
+      function endDrag() {
+        if (!dragging) return;
+        dragging = false;
+        slides[index].style.transition = '';
+        slides[index].style.transform = '';
+
+        if (deltaX <= -threshold) {
+          show((index + 1) % slides.length);
+        } else if (deltaX >= threshold) {
+          show((index - 1 + slides.length) % slides.length);
+        }
+        start();
+      }
+
+      root.addEventListener('pointerup', endDrag);
+      root.addEventListener('pointercancel', endDrag);
+    }
+
+    start();
+  }
+
+  initCarousel(document.getElementById('authCarousel'));
+
+  {% if form.non_field_errors %}
+  showAppToast("{{ form.non_field_errors|striptags|escapejs }}", 'danger');
+  {% endif %}
+
+  (function () {
+    const params = new URLSearchParams(window.location.search);
+    if (params.get('password_reset') !== '1') return;
+
+    showAppToast('Senha redefinida com sucesso! Faça login com a nova senha.', 'success');
+
+    params.delete('password_reset');
+    const newSearch = params.toString();
+    const newUrl =
+      window.location.pathname + (newSearch ? '?' + newSearch : '');
+    window.history.replaceState({}, '', newUrl);
+  })();
 </script>
 
 {% endblock content %}

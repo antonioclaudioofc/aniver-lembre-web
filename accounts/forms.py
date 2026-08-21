@@ -1,5 +1,6 @@
 from django import forms
 from django.contrib.auth.models import User
+from django.contrib.auth.password_validation import validate_password
 from django.core.exceptions import ValidationError
 from django.db.models import Q
 from .models import Profile
@@ -46,7 +47,6 @@ class ProfileRegisterForm(forms.ModelForm):
     def save(self, commit=True):
         user = super().save(commit=False)
         user.set_password(self.cleaned_data["password"])
-        # Kept inactive until the e-mail verification code is confirmed.
         user.is_active = False
 
         if commit:
@@ -94,3 +94,39 @@ class VerifyEmailForm(forms.Form):
         if not code.isdigit():
             raise ValidationError("O código deve conter apenas números.")
         return code
+
+
+class PasswordResetRequestForm(forms.Form):
+    identifier = forms.CharField(label="Usuário ou e-mail")
+
+
+class SetNewPasswordForm(forms.Form):
+    new_password = forms.CharField(
+        label="Nova senha", widget=forms.PasswordInput)
+    confirm_new_password = forms.CharField(
+        label="Confirme a nova senha", widget=forms.PasswordInput
+    )
+
+    def __init__(self, *args, user=None, **kwargs):
+        self.user = user
+        super().__init__(*args, **kwargs)
+
+    def clean_new_password(self):
+        password = self.cleaned_data.get("new_password", "")
+        validate_password(password, user=self.user)
+        return password
+
+    def clean(self):
+        cleaned_data = super().clean()
+        password = cleaned_data.get("new_password")
+        confirm = cleaned_data.get("confirm_new_password")
+
+        if password and confirm and password != confirm:
+            self.add_error("confirm_new_password",
+                           "As senhas devem ser iguais.")
+
+        if password and self.user and self.user.check_password(password):
+            self.add_error(
+                "new_password", "A nova senha deve ser diferente da senha atual.")
+
+        return cleaned_data
