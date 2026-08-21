@@ -78,3 +78,65 @@ def verify_code(profile, submitted_code: str) -> tuple[bool, str]:
     profile.user.save(update_fields=['is_active'])
     profile.save(update_fields=['email_verified', 'verification_code'])
     return True, ''
+
+
+def can_resend_reset_code(profile) -> bool:
+    if not profile.reset_sent_at:
+        return True
+    elapsed = (timezone.now() - profile.reset_sent_at).total_seconds()
+    return elapsed >= RESEND_COOLDOWN_SECONDS
+
+
+def send_password_reset_code(profile) -> None:
+    code = f"{secrets.randbelow(10 ** CODE_LENGTH):0{CODE_LENGTH}d}"
+    profile.reset_code = code
+    profile.reset_sent_at = timezone.now()
+    profile.reset_attempts = 0
+    profile.save(update_fields=[
+        'reset_code', 'reset_sent_at', 'reset_attempts',
+    ])
+
+    context = {
+        'first_name': profile.user.first_name,
+        'code': code,
+        'ttl_minutes': CODE_TTL_MINUTES,
+        'logo_url': _logo_url(),
+    }
+    text_body = render_to_string('emails/password_reset_code.txt', context)
+    html_body = render_to_string('emails/password_reset_code.html', context)
+
+    email = EmailMultiAlternatives(
+        subject="Redefinir sua senha — AniverLembre",
+        body=text_body,
+        from_email=settings.DEFAULT_FROM_EMAIL,
+        to=[profile.user.email],
+    )
+    email.attach_alternative(html_body, 'text/html')
+    email.send(fail_silently=False)
+
+
+def verify_reset_code(profile, submitted_code: str) -> tuple[bool, str]:
+    if not profile.reset_code or not profile.reset_sent_at:
+        return False, 'Nenhum código pendente. Solicite um novo.'
+
+    if profile.reset_attempts >= MAX_ATTEMPTS:
+        return False, 'Muitas tentativas erradas. Solicite um novo código.'
+
+    expires_at = profile.reset_sent_at + timedelta(minutes=CODE_TTL_MINUTES)
+    if timezone.now() > expires_at:
+        return False, 'Esse código expirou. Solicite um novo.'
+
+    if submitted_code != profile.reset_code:
+        profile.reset_attempts += 1
+        profile.save(update_fields=['reset_attempts'])
+        return False, 'Código incorreto.'
+
+    return True, ''
+
+
+def clear_reset_code(profile) -> None:
+    profile.reset_code = ''
+    profile.reset_sent_at = None
+    profile.reset_attempts = 0
+    profile.save(update_fields=['reset_code',
+                 'reset_sent_at', 'reset_attempts'])

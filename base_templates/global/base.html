@@ -3,34 +3,33 @@
   <head>
     {% include "partials/_head.html" %}
   </head>
-  <body class="inter">
-    {% block content %}
-    <h1 class="text-3xl font-bold underline">Hello world!</h1>
-    <!-- loads the entire Variable Font -->
-    <link
-      href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&icon_names=favorite,home,search,settings"
-      rel="stylesheet"
-    />
+  <body
+    class="inter bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 transition-colors duration-200"
+  >
+    {% block content %}{% endblock content %}
 
-    <!-- thin outlined icons -->
-    <div
-      style="font-variation-settings: 'FILL' 0, 'wght' 100, 'GRAD' 0, 'opsz' 48"
+    <button
+      type="button"
+      id="themeToggle"
+      aria-label="Alternar tema claro/escuro"
+      class="fixed bottom-4 right-4 z-50 w-12 h-12 rounded-full bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 shadow-lg flex items-center justify-center text-gray-600 dark:text-gray-300 hover:scale-105 active:scale-95 transition-transform"
     >
-      <span class="material-symbols-outlined">search</span>
-      <span class="material-symbols-outlined">home</span>
-      <span class="material-symbols-outlined">settings</span>
-      <span class="material-symbols-outlined">favorite</span>
-    </div>
+      <span class="material-symbols-outlined text-xl dark:hidden">dark_mode</span>
+      <span class="material-symbols-outlined text-xl hidden dark:inline">light_mode</span>
+    </button>
 
-    <!-- thick filled icons -->
-    <div
-      style="font-variation-settings: 'FILL' 1, 'wght' 700, 'GRAD' 0, 'opsz' 48"
-    >
-      <span class="material-symbols-outlined">search</span>
-      <span class="material-symbols-outlined">home</span>
-      <span class="material-symbols-outlined">settings</span>
-      <span class="material-symbols-outlined">favorite</span>
-    </div>
-    {% endblock content %}
+    <script>
+      (function () {
+        const toggle = document.getElementById('themeToggle');
+        if (!toggle) return;
+
+        toggle.addEventListener('click', () => {
+          const isDark = document.documentElement.classList.toggle('dark');
+          try {
+            localStorage.setItem('theme', isDark ? 'dark' : 'light');
+          } catch (e) {}
+        });
+      })();
+    </script>
   </body>
 </html>

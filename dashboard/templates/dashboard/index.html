@@ -1,9 +1,9 @@
 {% extends "global/base.html" %} {% load static %} {% block content %}
 
-<nav class="w-full border-b border-gray-300 bg-white">
+<nav class="w-full border-b border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-900">
   <div class="max-w-7xl mx-auto p-4 flex items-center justify-between">
     <div
-      class="flex items-center gap-3 cursor-pointer transitions-opcaity hover:opacity-80"
+      class="flex items-center gap-3 cursor-pointer transitions-opcaity hover:opacity-80 text-gray-900 dark:text-gray-100"
       onclick="location.href='{% url 'dashboard:index' %}'"
     >
       <img src="{% static 'images/logo.svg' %}" alt="Logo" class="w-8 h-8" />
@@ -13,18 +13,18 @@
       <div class="relative">
         <button
           id="profileDropdownBtn"
-          class="flex items-center gap-2 px-3 py-2 rounded-full bg-white hover:bg-gray-100 outline-none transition-colors"
+          class="flex items-center gap-2 px-3 py-2 rounded-full bg-white dark:bg-gray-900 hover:bg-gray-100 dark:hover:bg-gray-800 outline-none transition-colors"
         >
           <div
             class="w-8 h-8 rounded-full bg-indigo-600 text-white font-semibold flex items-center justify-center flex-shrink-0"
           >
             {{ user.username|slice:":1"|upper }}
           </div>
-          <span class="text-sm font-medium text-gray-700"
+          <span class="text-sm font-medium text-gray-700 dark:text-gray-300"
             >{{ user.username }}</span
           >
           <span
-            class="material-symbols-outlined text-gray-500 text-base flex-shrink-0"
+            class="material-symbols-outlined text-gray-500 dark:text-gray-400 text-base flex-shrink-0"
           >
             expand_more
           </span>
@@ -32,21 +32,21 @@
 
         <div
           id="profileDropdown"
-          class="hidden absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 border z-50"
+          class="hidden absolute right-0 mt-2 w-48 bg-white dark:bg-gray-800 rounded-md shadow-lg py-1 border border-gray-200 dark:border-gray-700 z-50"
         >
           <a
             href="{% url 'accounts:profile' %}"
-            class="block px-4 py-2 text-sm text-gray-700 font-medium hover:bg-gray-100"
+            class="block px-4 py-2 text-sm text-gray-700 dark:text-gray-200 font-medium hover:bg-gray-100 dark:hover:bg-gray-700"
           >
             <span
-              class="material-symbols-outlined text-gray-600 text-sm align-middle mr-2"
+              class="material-symbols-outlined text-gray-600 dark:text-gray-400 text-sm align-middle mr-2"
               >person</span
             >
             Perfil
           </a>
           <a
             href="{% url 'accounts:logout' %}"
-            class="block px-4 py-2 text-sm text-red-700 font-medium hover:bg-gray-100"
+            class="block px-4 py-2 text-sm text-red-700 dark:text-red-400 font-medium hover:bg-gray-100 dark:hover:bg-gray-700"
           >
             <span
               class="material-symbols-outlined text-red-600 text-sm align-middle mr-2 text-medium"
@@ -63,7 +63,7 @@
 <main class="max-w-7xl mx-auto px-4 py-6">
   <div class="flex items-center justify-between mb-6 gap-3 flex-wrap">
     <div>
-      <h1 class="text-3xl font-bold text-gray-900">Seus Lembretes</h1>
+      <h1 class="text-3xl font-bold text-gray-900 dark:text-gray-100">Seus Lembretes</h1>
     </div>
     <button
       id="openCreateDialog"
@@ -77,7 +77,7 @@
   <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
     {% for r in reminders %}
     <div
-      class="group relative rounded-2xl border border-gray-100 shadow-sm bg-white overflow-hidden"
+      class="group relative rounded-2xl border border-gray-100 dark:border-gray-700 shadow-sm bg-white dark:bg-gray-800 overflow-hidden"
       data-reminder-card
     >
       <div class="absolute inset-0 bg-gradient-to-br from-indigo-50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
@@ -88,29 +88,29 @@
               {{ r.contact.name|slice:":1"|upper }}
             </div>
             <div>
-              <h3 class="font-semibold text-gray-900">{{ r.contact.name }}</h3>
-              <p class="text-sm text-gray-600 flex items-center gap-1">
+              <h3 class="font-semibold text-gray-900 dark:text-gray-100">{{ r.contact.name }}</h3>
+              <p class="text-sm text-gray-600 dark:text-gray-400 flex items-center gap-1">
                 <span class="material-symbols-outlined text-base text-indigo-500">cake</span>
                 {{ r.contact.birthday|date:"d/m" }}
               </p>
             </div>
           </div>
           <span
-            class="text-xs px-2 py-1 rounded-full border {{ r.active|yesno:'bg-green-50 text-green-700 border-green-200,bg-gray-50 text-gray-700 border-gray-200' }}"
+            class="text-xs px-2 py-1 rounded-full border {{ r.active|yesno:'bg-green-50 dark:bg-green-950 text-green-700 dark:text-green-300 border-green-200 dark:border-green-800,bg-gray-50 dark:bg-gray-700 text-gray-700 dark:text-gray-300 border-gray-200 dark:border-gray-600' }}"
             >{{ r.active|yesno:'Ativo,Inativo' }}</span
           >
         </div>
 
         {% if r.contact.relationship or r.contact.notes %}
-        <div class="text-sm text-gray-700 space-y-1">
+        <div class="text-sm text-gray-700 dark:text-gray-300 space-y-1">
           {% if r.contact.relationship %}
-          <p class="flex items-center gap-2 text-gray-600">
+          <p class="flex items-center gap-2 text-gray-600 dark:text-gray-400">
             <span class="material-symbols-outlined text-base text-indigo-500">diversity_1</span>
             {{ r.contact.relationship }}
           </p>
           {% endif %}
           {% if r.contact.notes %}
-          <p class="flex items-start gap-2 text-gray-600">
+          <p class="flex items-start gap-2 text-gray-600 dark:text-gray-400">
             <span class="material-symbols-outlined text-base text-indigo-500 mt-0.5">notes</span>
             <span class="line-clamp-2">{{ r.contact.notes }}</span>
           </p>
@@ -118,18 +118,18 @@
         </div>
         {% endif %}
 
-        <div class="flex items-center justify-between pt-2 border-t border-gray-100 text-sm">
-          <div class="flex flex-col text-gray-700">
+        <div class="flex items-center justify-between pt-2 border-t border-gray-100 dark:border-gray-700 text-sm">
+          <div class="flex flex-col text-gray-700 dark:text-gray-300">
             <span class="flex items-center gap-1">
               <span class="material-symbols-outlined text-base text-indigo-500">notifications_active</span>
               {{ r.notify_at|time:"H:i" }}
             </span>
-            <span class="text-gray-500">{{ r.days_before }} dia{{ r.days_before|pluralize:"s" }} antes</span>
+            <span class="text-gray-500 dark:text-gray-400">{{ r.days_before }} dia{{ r.days_before|pluralize:"s" }} antes</span>
           </div>
           <div class="flex items-center gap-2">
             <button
               type="button"
-              class="flex items-center gap-1 px-3 py-1.5 rounded-lg border border-gray-200 text-gray-700 hover:border-indigo-200 hover:text-indigo-700 transition-colors text-sm"
+              class="flex items-center gap-1 px-3 py-1.5 rounded-lg border border-gray-200 dark:border-gray-600 text-gray-700 dark:text-gray-300 hover:border-indigo-200 dark:hover:border-indigo-700 hover:text-indigo-700 dark:hover:text-indigo-400 transition-colors text-sm"
               data-edit-reminder
               data-reminder-id="{{ r.id }}"
               data-name="{{ r.contact.name|escape }}"
@@ -152,7 +152,7 @@
               {% csrf_token %}
               <button
                 type="submit"
-                class="flex items-center gap-1 px-3 py-1.5 rounded-lg border border-red-200 text-red-700 hover:border-red-300 hover:bg-red-50 transition-colors text-sm"
+                class="flex items-center gap-1 px-3 py-1.5 rounded-lg border border-red-200 dark:border-red-800 text-red-700 dark:text-red-400 hover:border-red-300 dark:hover:border-red-600 hover:bg-red-50 dark:hover:bg-red-950 transition-colors text-sm"
               >
                 <span class="material-symbols-outlined text-base">delete</span>
                 Excluir
@@ -165,7 +165,7 @@
     {% endfor %}
   </div>
   {% else %}
-  <p class="text-gray-600">Você ainda não tem lembretes. Crie o primeiro!</p>
+  <p class="text-gray-600 dark:text-gray-400">Você ainda não tem lembretes. Crie o primeiro!</p>
   {% endif %}
 </main>
 
@@ -173,12 +173,12 @@
   id="createDialog"
   class="rounded-lg max-w-2xl w-5/6 p-0 backdrop:bg-black backdrop:bg-opacity-50 px-4"
 >
-  <div class="bg-white rounded-lg">
-    <div class="flex justify-between items-center px-6 py-4 border-b">
-      <h3 class="text-xl font-semibold text-gray-800" id="dialogTitle">{% if is_editing %}Editar Lembrete{% else %}Novo Lembrete{% endif %}</h3>
+  <div class="bg-white dark:bg-gray-800 rounded-lg">
+    <div class="flex justify-between items-center px-6 py-4 border-b border-gray-200 dark:border-gray-700">
+      <h3 class="text-xl font-semibold text-gray-800 dark:text-gray-100" id="dialogTitle">{% if is_editing %}Editar Lembrete{% else %}Novo Lembrete{% endif %}</h3>
       <button
         id="closeCreateDialog"
-        class="text-gray-400 hover:text-gray-600 transition-colors"
+        class="text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-300 transition-colors"
       >
         <span class="material-symbols-outlined">close</span>
       </button>
@@ -193,7 +193,7 @@
 
       <div class="space-y-4">
         <h4
-          class="text-base font-semibold text-gray-700 flex items-center gap-2"
+          class="text-base font-semibold text-gray-700 dark:text-gray-300 flex items-center gap-2"
         >
           <span class="material-symbols-outlined text-indigo-600">person</span>
           Informações do Contato
@@ -201,7 +201,7 @@
 
         <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <div class="flex flex-col">
-            <label class="mb-1 font-medium text-sm text-gray-700"
+            <label class="mb-1 font-medium text-sm text-gray-700 dark:text-gray-300"
               >{{ contact_form.name.label }} *</label
             >
             {{ contact_form.name }} {% if contact_form.name.errors %}
@@ -214,7 +214,7 @@
           </div>
 
           <div class="flex flex-col">
-            <label class="mb-1 font-medium text-sm text-gray-700"
+            <label class="mb-1 font-medium text-sm text-gray-700 dark:text-gray-300"
               >{{ contact_form.birthday.label }} *</label
             >
             {{ contact_form.birthday }} {% if contact_form.birthday.errors %}
@@ -227,10 +227,10 @@
           </div>
 
           <div class="flex flex-col sm:col-span-2">
-            <label class="mb-1 font-medium text-sm text-gray-700"
+            <label class="mb-1 font-medium text-sm text-gray-700 dark:text-gray-300"
               >{{ contact_form.relationship.label }}</label
             >
-            {{ contact_form.relationship }} 
+            {{ contact_form.relationship }}
             {% if contact_form.relationship.errors %}
             <div class="text-red-600 text-xs mt-1">
               {% for error in contact_form.relationship.errors %}
@@ -241,7 +241,7 @@
           </div>
 
           <div class="flex flex-col sm:col-span-2">
-            <label class="mb-1 font-medium text-sm text-gray-700"
+            <label class="mb-1 font-medium text-sm text-gray-700 dark:text-gray-300"
               >{{ contact_form.notes.label }}</label
             >
             {{ contact_form.notes }} {% if contact_form.notes.errors %}
@@ -255,11 +255,11 @@
         </div>
       </div>
 
-      <div class="border-t"></div>
+      <div class="border-t border-gray-200 dark:border-gray-700"></div>
 
       <div class="space-y-4">
         <h4
-          class="text-base font-semibold text-gray-700 flex items-center gap-2"
+          class="text-base font-semibold text-gray-700 dark:text-gray-300 flex items-center gap-2"
         >
           <span class="material-symbols-outlined text-indigo-600"
             >notifications</span
@@ -269,7 +269,7 @@
 
         <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <div class="flex flex-col">
-            <label class="mb-1 font-medium text-sm text-gray-700"
+            <label class="mb-1 font-medium text-sm text-gray-700 dark:text-gray-300"
               >{{ reminder_form.days_before.label }} *</label
             >
             {{ reminder_form.days_before }}
@@ -283,7 +283,7 @@
           </div>
 
           <div class="flex flex-col">
-            <label class="mb-1 font-medium text-sm text-gray-700"
+            <label class="mb-1 font-medium text-sm text-gray-700 dark:text-gray-300"
               >{{ reminder_form.notify_at.label }} *</label
             >
             {{ reminder_form.notify_at }}
@@ -300,7 +300,7 @@
             {{ reminder_form.active }}
             <label
               for="id_active"
-              class="text-sm font-medium text-gray-700 cursor-pointer"
+              class="text-sm font-medium text-gray-700 dark:text-gray-300 cursor-pointer"
               >{{ reminder_form.active.label }}</label
             >
             {% if reminder_form.active.errors %}
@@ -314,11 +314,11 @@
         </div>
       </div>
 
-      <div class="flex justify-end max-md:justify-center gap-3 pt-4 border-t">
+      <div class="flex justify-end max-md:justify-center gap-3 pt-4 border-t border-gray-200 dark:border-gray-700">
         <button
           type="button"
           id="cancelCreate"
-          class="px-6 py-2.5 rounded-lg border border-gray-300 text-gray-700 font-medium hover:bg-gray-50 transition-colors"
+          class="px-6 py-2.5 rounded-lg border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 font-medium hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
         >
           Cancelar
         </button>
@@ -397,7 +397,6 @@
       closeCreate();
     });
 
-  // Manter o dialog aberto se houver erros
   {% if show_dialog %}
   setTimeout(() => {
     openCreate();
@@ -421,7 +420,6 @@
     });
   }
 
-  // Editar com o mesmo diálogo
   document.querySelectorAll("[data-edit-reminder]").forEach((btn) => {
     btn.addEventListener("click", () => {
       const dataset = btn.dataset;
@@ -455,7 +453,6 @@
     });
   });
 
-  // Dropdown de Perfil
   const profileDropdownBtn = document.getElementById("profileDropdownBtn");
   const profileDropdown = document.getElementById("profileDropdown");
 
@@ -474,6 +471,19 @@
       }
     });
   }
+
+  (function () {
+    const params = new URLSearchParams(window.location.search);
+    if (params.get("email_verified") !== "1") return;
+
+    showAppToast("E-mail confirmado com sucesso! Bem-vindo(a).", "success");
+
+    params.delete("email_verified");
+    const newSearch = params.toString();
+    const newUrl =
+      window.location.pathname + (newSearch ? "?" + newSearch : "");
+    window.history.replaceState({}, "", newUrl);
+  })();
 </script>
 
 {% endblock %}

@@ -9,12 +9,9 @@
       alt="Momentos"
     />
     <div class="max-w-96 text-center">
-      <h2 class="text-4xl font-bold mb-2 text-white">
-        Falta pouco!
-      </h2>
+      <h2 class="text-4xl font-bold mb-2 text-white">Quase lá!</h2>
       <p class="text-gray-200">
-        Confirme seu e-mail para começar a receber seus lembretes de
-        aniversário.
+        Digite o código que enviamos pro seu e-mail.
       </p>
     </div>
   </div>
@@ -25,12 +22,10 @@
         alt="AniverLembre Logo"
         class="w-[8rem] max-h-[32rem] mx-auto"
       />
-      <h2 class="text-4xl font-bold text-center max-sm:text-3xl">
-        Confirme seu e-mail
-      </h2>
-      <p class="text-gray-500 dark:text-gray-400 text-center max-sm:text-sm mb-6">
-        Enviamos um código de 6 dígitos para
-        <span class="font-medium text-gray-700 dark:text-gray-300">{{ email }}</span>.
+      <h2 class="text-3xl font-bold text-center">Digite o código</h2>
+      <p class="text-gray-500 dark:text-gray-400 text-center text-sm mb-6">
+        Se o usuário/e-mail existir, enviamos um código de 6 dígitos por
+        e-mail.
       </p>
 
       {% if service_error %}
@@ -69,15 +64,15 @@
 
         <button
           type="submit"
-          id="verifyBtn"
+          id="resetCodeBtn"
           class="w-full bg-indigo-500 hover:bg-indigo-600 text-white py-3 rounded-lg font-semibold transition disabled:opacity-70 disabled:cursor-not-allowed flex items-center justify-center gap-2"
         >
           <span
             class="material-symbols-outlined animate-spin hidden"
-            id="verifySpinner"
+            id="resetCodeSpinner"
             >progress_activity</span
           >
-          <span id="verifyText">Confirmar</span>
+          <span id="resetCodeText">Confirmar código</span>
         </button>
       </form>
 
@@ -105,16 +100,16 @@
 </section>
 
 <script>
-  const verifyForm = document.querySelector('form');
-  const verifyBtn = document.getElementById('verifyBtn');
-  const verifySpinner = document.getElementById('verifySpinner');
-  const verifyText = document.getElementById('verifyText');
+  const resetCodeForm = document.querySelector('form');
+  const resetCodeBtn = document.getElementById('resetCodeBtn');
+  const resetCodeSpinner = document.getElementById('resetCodeSpinner');
+  const resetCodeText = document.getElementById('resetCodeText');
 
-  if (verifyForm) {
-    verifyForm.addEventListener('submit', function () {
-      verifyBtn.disabled = true;
-      verifySpinner.classList.remove('hidden');
-      verifyText.textContent = 'Confirmando...';
+  if (resetCodeForm) {
+    resetCodeForm.addEventListener('submit', function () {
+      resetCodeBtn.disabled = true;
+      resetCodeSpinner.classList.remove('hidden');
+      resetCodeText.textContent = 'Confirmando...';
     });
   }
 </script>

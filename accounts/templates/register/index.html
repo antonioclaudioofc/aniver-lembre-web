@@ -28,13 +28,13 @@
       <h2 class="text-4xl font-bold text-center max-sm:text-3xl">
         Crie sua conta
       </h2>
-      <p class="text-gray-500 text-center max-sm:text-sm mb-6">
+      <p class="text-gray-500 dark:text-gray-400 text-center max-sm:text-sm mb-6">
         Preencha as informações abaixo!
       </p>
 
       <form method="POST" class="space-y-4 w-full">
         {% csrf_token %} {% if form.non_field_errors %}
-        <div class="bg-red-100 text-red-700 p-3 rounded-md text-sm">
+        <div class="bg-red-100 dark:bg-red-950 text-red-700 dark:text-red-300 p-3 rounded-md text-sm">
           {{ form.non_field_errors }}
         </div>
         {% endif %} {% for field in form %}
@@ -48,8 +48,8 @@
             name="{{ field.name }}"
             value="{{ field.value|default:'' }}"
             placeholder="{% if field.name == 'username' %}Crie um nome de usuário{% elif field.name == 'email' %}Insira seu e-mail{% elif field.name == 'password' %}Insira sua senha{% elif field.name == 'confirm_password' %}Insira sua senha novamente{% elif field.name == 'first_name' %}Insira seu nome{% else %}{{ field.label }}{% endif %}"
-            class="bg-white w-full text-black rounded-md border border-gray-200 px-4 py-3 text-sm transition-colors placeholder:text-gray-500 outline-none focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500 disabled:cursor-not-allowed disabled:opacity-50"
-            autocomplete="off"
+            class="bg-white dark:bg-gray-800 w-full text-black dark:text-white rounded-md border border-gray-200 dark:border-gray-700 px-4 py-3 text-sm transition-colors placeholder:text-gray-500 dark:placeholder:text-gray-500 outline-none focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500 disabled:cursor-not-allowed disabled:opacity-50"
+            autocomplete="{% if field.name == 'first_name' %}given-name{% elif field.name == 'username' %}username{% elif field.name == 'email' %}email{% elif field.name == 'password' or field.name == 'confirm_password' %}new-password{% endif %}"
           />
 
           {% if field.errors %}
@@ -72,11 +72,11 @@
         </button>
       </form>
 
-      <p class="text-center text-sm text-gray-600 mt-4">
+      <p class="text-center text-sm text-gray-600 dark:text-gray-400 mt-4">
         Já tem conta?
         <a
           href="{% url 'accounts:login' %}"
-          class="text-blue-600 hover:underline font-medium"
+          class="text-blue-600 dark:text-blue-400 hover:underline font-medium"
         >
           Entrar
         </a>
