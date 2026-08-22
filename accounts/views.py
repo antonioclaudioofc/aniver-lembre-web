@@ -10,6 +10,7 @@ from .forms import (
     VerifyEmailForm,
     PasswordResetRequestForm,
     SetNewPasswordForm,
+    ProfileEditForm,
 )
 from .models import Profile
 from .services import (
@@ -21,11 +22,18 @@ from .services import (
     can_resend_reset_code,
     clear_reset_code,
 )
+from .utils import get_profile
+
+
+def _home_redirect(user):
+    if user.is_superuser:
+        return redirect('panel:overview')
+    return redirect('/')
 
 
 def index(request):
     if request.user.is_authenticated:
-        return redirect('/')
+        return _home_redirect(request.user)
     return render(request, 'accounts/index.html')
 
 
@@ -34,7 +42,7 @@ def register(request):
         form = ProfileRegisterForm(request.POST)
         if form.is_valid():
             user = form.save()
-            send_verification_code(user.profile)
+            send_verification_code(get_profile(user))
             request.session['pending_verification_user_id'] = user.id
             return redirect('accounts:verify_email')
     else:
@@ -44,18 +52,18 @@ def register(request):
 
 def login(request):
     if request.user.is_authenticated:
-        return redirect('/')
+        return _home_redirect(request.user)
 
     if request.method == "POST":
         form = LoginForm(request.POST)
         if form.is_valid():
             user = form.cleaned_data["user"]
             if not user.is_active:
-                send_verification_code(user.profile)
+                send_verification_code(get_profile(user))
                 request.session['pending_verification_user_id'] = user.id
                 return redirect('accounts:verify_email')
             auth_login(request, user)
-            return redirect("/")
+            return _home_redirect(user)
     else:
         form = LoginForm()
     return render(request, 'login/index.html', {"form": form})
@@ -113,7 +121,7 @@ def password_reset_request(request):
                 Q(username__iexact=identifier) | Q(email__iexact=identifier)
             ).first()
             if user is not None and user.email:
-                send_password_reset_code(user.profile)
+                send_password_reset_code(get_profile(user))
                 request.session['pending_reset_user_id'] = user.id
             return redirect('accounts:password_reset_confirm')
     else:
@@ -123,7 +131,6 @@ def password_reset_request(request):
 
 
 def password_reset_confirm(request):
-    """Step 1: enter the 6-digit code sent by e-mail."""
     if request.user.is_authenticated:
         return redirect('/')
 
@@ -165,7 +172,6 @@ def password_reset_confirm(request):
 
 
 def password_reset_new_password(request):
-    """Step 2: set a new password, only reachable after the code above is confirmed."""
     if request.user.is_authenticated:
         return redirect('/')
 
@@ -204,6 +210,26 @@ def logout_view(request):
 
 @login_required
 def profile(request):
+    profile_obj = get_profile(request.user)
+
+    if request.method == "POST":
+        form = ProfileEditForm(request.POST, instance=request.user)
+        if form.is_valid():
+            email_changed = form.cleaned_data['email'] != request.user.email
+            user = form.save()
+
+            if email_changed:
+                profile_obj.email_verified = False
+                profile_obj.save(update_fields=['email_verified'])
+                send_verification_code(profile_obj)
+                request.session['pending_verification_user_id'] = user.id
+                return redirect('accounts:verify_email')
+
+            return redirect(reverse('accounts:profile') + '?profile_updated=1')
+    else:
+        form = ProfileEditForm(instance=request.user)
+
     return render(request, 'profile/index.html', {
         'user': request.user,
+        'form': form,
     })

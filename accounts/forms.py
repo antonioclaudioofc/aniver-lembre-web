@@ -3,7 +3,6 @@ from django.contrib.auth.models import User
 from django.contrib.auth.password_validation import validate_password
 from django.core.exceptions import ValidationError
 from django.db.models import Q
-from .models import Profile
 
 
 class ProfileRegisterForm(forms.ModelForm):
@@ -51,11 +50,6 @@ class ProfileRegisterForm(forms.ModelForm):
 
         if commit:
             user.save()
-
-            Profile.objects.create(
-                user=user,
-                updated_at=None
-            )
 
         return user
 
@@ -130,3 +124,24 @@ class SetNewPasswordForm(forms.Form):
                 "new_password", "A nova senha deve ser diferente da senha atual.")
 
         return cleaned_data
+
+
+class ProfileEditForm(forms.ModelForm):
+    class Meta:
+        model = User
+        fields = ["first_name", "email"]
+        labels = {
+            "first_name": "Nome",
+            "email": "E-mail",
+        }
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields["first_name"].required = True
+        self.fields["email"].required = True
+
+    def clean_email(self):
+        email = self.cleaned_data.get("email")
+        if User.objects.filter(email=email).exclude(pk=self.instance.pk).exists():
+            raise ValidationError("E-mail já cadastrado.")
+        return email

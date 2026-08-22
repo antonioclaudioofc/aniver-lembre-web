@@ -1,0 +1,132 @@
+{% extends "global/base.html" %} {% load static dashboard_extras %} {% block content %}
+
+<div class="lg:flex min-h-screen">
+{% include "panel/_sidebar.html" %}
+
+<div class="flex-1 min-w-0">
+<main class="max-w-6xl mx-auto px-4 lg:px-8 py-8">
+  <div class="flex items-center justify-between mb-6 gap-3 flex-wrap">
+    <div>
+      <h1 class="text-2xl font-bold text-gray-900 dark:text-gray-100">Lembretes</h1>
+      <p class="text-sm text-gray-500 dark:text-gray-400 mt-0.5">
+        {{ page_obj.paginator.count }} lembrete{{ page_obj.paginator.count|pluralize:"s" }} de todos os usuários
+      </p>
+    </div>
+    <a
+      href="{% url 'panel:reminders_export' %}{% if search_query %}?q={{ search_query|urlencode }}{% endif %}"
+      class="flex items-center gap-1.5 px-4 py-2 rounded-lg border border-gray-200 dark:border-gray-600 text-sm font-medium text-gray-600 dark:text-gray-300 hover:border-indigo-300 dark:hover:border-indigo-600 hover:text-indigo-600 dark:hover:text-indigo-400 hover:bg-indigo-50 dark:hover:bg-indigo-950 transition-colors"
+    >
+      <span class="material-symbols-outlined text-lg">download</span>
+      Exportar CSV
+    </a>
+  </div>
+
+  <div class="mb-6 p-4 rounded-xl border border-gray-100 dark:border-gray-700 bg-gray-50/60 dark:bg-gray-900/30">
+    <form method="get" class="flex items-center gap-3">
+      <div class="relative flex-1 max-w-2xl">
+        <span class="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 dark:text-gray-500 text-xl pointer-events-none">search</span>
+        <input
+          type="text"
+          name="q"
+          value="{{ search_query }}"
+          placeholder="Buscar por contato ou dono (usuário/e-mail)..."
+          class="w-full pl-12 pr-4 py-3.5 rounded-lg border border-gray-300 dark:border-gray-600 shadow-sm bg-white dark:bg-gray-800 text-base text-black dark:text-white placeholder:text-gray-400 dark:placeholder:text-gray-500 outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+        />
+      </div>
+      {% if search_query %}
+      <a
+        href="{% url 'panel:reminders' %}"
+        class="flex-shrink-0 flex items-center gap-1 px-3 py-2 rounded-lg border border-red-200 dark:border-red-800 text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-950 hover:border-red-300 dark:hover:border-red-600 transition-colors text-sm font-medium whitespace-nowrap"
+      >
+        <span class="material-symbols-outlined text-base">filter_alt_off</span>
+        Limpar
+      </a>
+      {% endif %}
+    </form>
+  </div>
+
+  {% if page_obj %}
+  <div class="rounded-2xl border border-gray-100 dark:border-gray-700 bg-white dark:bg-gray-800 shadow-sm overflow-hidden opacity-0 animate-[fadeUp_0.5s_cubic-bezier(0.16,1,0.3,1)_forwards] motion-reduce:animate-none motion-reduce:opacity-100">
+    <div class="overflow-x-auto">
+      <table class="w-full text-sm">
+        <thead>
+          <tr class="border-b border-gray-100 dark:border-gray-700 text-left text-xs font-semibold text-gray-400 dark:text-gray-500 uppercase tracking-wide">
+            <th class="px-4 py-3">Contato</th>
+            <th class="px-4 py-3">Dono</th>
+            <th class="px-4 py-3">Aniversário</th>
+            <th class="px-4 py-3">Lembrete</th>
+            <th class="px-4 py-3">Status</th>
+            <th class="px-4 py-3">Último envio</th>
+          </tr>
+        </thead>
+        <tbody class="divide-y divide-gray-100 dark:divide-gray-700">
+          {% for r in reminders %}
+          <tr class="hover:bg-gray-50 dark:hover:bg-gray-900/40 transition-colors">
+            <td class="px-4 py-3">
+              <div class="flex items-center gap-2.5">
+                <div class="w-8 h-8 rounded-full bg-{{ r.contact.id|avatar_color }}-600 text-white text-xs font-semibold flex items-center justify-center flex-shrink-0">
+                  {{ r.contact.name|slice:":1"|upper }}
+                </div>
+                <div class="min-w-0">
+                  <p class="font-medium text-gray-900 dark:text-gray-100 truncate">{{ r.contact.name }}</p>
+                  {% if r.contact.relationship %}<p class="text-xs text-gray-500 dark:text-gray-400 truncate">{{ r.contact.relationship }}</p>{% endif %}
+                </div>
+              </div>
+            </td>
+            <td class="px-4 py-3 text-gray-600 dark:text-gray-400">
+              <p class="text-gray-900 dark:text-gray-100">@{{ r.contact.owner.user.username }}</p>
+              <p class="text-xs">{{ r.contact.owner.user.email|default:"—" }}</p>
+            </td>
+            <td class="px-4 py-3 text-gray-600 dark:text-gray-400">{{ r.contact.birthday|date:"d/m/Y" }}</td>
+            <td class="px-4 py-3 text-gray-600 dark:text-gray-400">
+              {{ r.notify_at|time:"H:i" }} · {{ r.days_before }} dia{{ r.days_before|pluralize:"s" }} antes
+            </td>
+            <td class="px-4 py-3">
+              <span class="text-xs px-2 py-1 rounded-full border {{ r.active|yesno:'bg-green-50 dark:bg-green-950 text-green-700 dark:text-green-300 border-green-200 dark:border-green-800,bg-gray-50 dark:bg-gray-700 text-gray-700 dark:text-gray-300 border-gray-200 dark:border-gray-600' }}">
+                {{ r.active|yesno:'Ativo,Inativo' }}
+              </span>
+            </td>
+            <td class="px-4 py-3 text-gray-500 dark:text-gray-400">{{ r.last_notified_year|default:"Nunca" }}</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  {% if page_obj.has_other_pages %}
+  <nav class="mt-8 flex items-center justify-center gap-1.5" aria-label="Paginação">
+    {% if page_obj.has_previous %}
+    <a href="?page={{ page_obj.previous_page_number }}{{ page_qs }}" class="w-9 h-9 flex items-center justify-center rounded-lg border border-gray-200 dark:border-gray-700 text-gray-600 dark:text-gray-300 hover:border-indigo-300 dark:hover:border-indigo-600 hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors" aria-label="Página anterior">
+      <span class="material-symbols-outlined text-lg">chevron_left</span>
+    </a>
+    {% endif %}
+    {% for p in pagination_range %}
+    {% if p == None %}
+    <span class="w-9 h-9 flex items-center justify-center text-gray-400 dark:text-gray-600 select-none">…</span>
+    {% elif p == page_obj.number %}
+    <span class="w-9 h-9 flex items-center justify-center rounded-lg bg-indigo-600 text-white text-sm font-semibold" aria-current="page">{{ p }}</span>
+    {% else %}
+    <a href="?page={{ p }}{{ page_qs }}" class="w-9 h-9 flex items-center justify-center rounded-lg border border-gray-200 dark:border-gray-700 text-gray-600 dark:text-gray-300 hover:border-indigo-300 dark:hover:border-indigo-600 hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors text-sm font-medium">{{ p }}</a>
+    {% endif %}
+    {% endfor %}
+    {% if page_obj.has_next %}
+    <a href="?page={{ page_obj.next_page_number }}{{ page_qs }}" class="w-9 h-9 flex items-center justify-center rounded-lg border border-gray-200 dark:border-gray-700 text-gray-600 dark:text-gray-300 hover:border-indigo-300 dark:hover:border-indigo-600 hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors" aria-label="Próxima página">
+      <span class="material-symbols-outlined text-lg">chevron_right</span>
+    </a>
+    {% endif %}
+  </nav>
+  {% endif %}
+
+  {% else %}
+  <div class="text-center py-16">
+    <span class="material-symbols-outlined text-5xl text-gray-300 dark:text-gray-600 mb-3 block">search_off</span>
+    <p class="text-gray-600 dark:text-gray-400 mb-1">Nenhum lembrete encontrado.</p>
+    <a href="{% url 'panel:reminders' %}" class="text-indigo-600 dark:text-indigo-400 hover:underline text-sm font-medium">Limpar busca</a>
+  </div>
+  {% endif %}
+</main>
+</div>
+</div>
+
+{% endblock content %}

@@ -7,8 +7,10 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.urls import reverse
 from django.contrib.auth.decorators import login_required
 from django.utils import timezone
+from accounts.utils import get_profile
 from contacts.models import Contact
 from contacts.forms import ContactForm
+from core.pagination import pagination_range
 from reminders.forms import ReminderForm
 from reminders.models import Reminder
 
@@ -26,7 +28,7 @@ def _days_until_birthday(birthday, today):
         try:
             occurrence = birthday.replace(year=year)
         except ValueError:
-            continue  # 29/fev em ano não bissexto
+            continue
         if occurrence >= today:
             return (occurrence - today).days
     return None
@@ -84,27 +86,6 @@ def _redirect_to_index(page=None, status=None):
     return redirect(url)
 
 
-def _pagination_range(current, total, window=PAGINATION_WINDOW):
-    """Lista de páginas a exibir, com None marcando reticências.
-    Ex.: current=6, total=20 -> [1, None, 4, 5, 6, 7, 8, None, 20]."""
-    if total <= 1:
-        return []
-
-    pages = {1, total}
-    for p in range(current - window, current + window + 1):
-        if 1 <= p <= total:
-            pages.add(p)
-
-    result = []
-    prev = None
-    for p in sorted(pages):
-        if prev is not None and p - prev > 1:
-            result.append(None)
-        result.append(p)
-        prev = p
-    return result
-
-
 def _dashboard_context(request, profile):
     reminders, search_query, selected_month = _filtered_reminders(
         request, profile)
@@ -133,13 +114,13 @@ def _dashboard_context(request, profile):
         'months': _month_options(profile, base_qd),
         'all_months_qs': all_qd.urlencode(),
         'page_qs': page_qs,
-        'pagination_range': _pagination_range(page_obj.number, paginator.num_pages),
+        'pagination_range': pagination_range(page_obj.number, paginator.num_pages, PAGINATION_WINDOW),
     }
 
 
 @login_required
 def index(request):
-    profile = request.user.profile
+    profile = get_profile(request.user)
 
     context = _dashboard_context(request, profile)
     context['contacts'] = Contact.objects.filter(owner=profile)
@@ -154,7 +135,7 @@ def create_reminder(request):
     if request.method != 'POST':
         return redirect(reverse('dashboard:index'))
 
-    profile = request.user.profile
+    profile = get_profile(request.user)
     reminder_id = request.POST.get('reminder_id')
 
     reminder_instance = None
@@ -192,7 +173,7 @@ def create_reminder(request):
 
 @login_required
 def delete_reminder(request, reminder_id):
-    profile = request.user.profile
+    profile = get_profile(request.user)
     if request.method == 'POST':
         reminder = get_object_or_404(
             Reminder, pk=reminder_id, contact__owner=profile)

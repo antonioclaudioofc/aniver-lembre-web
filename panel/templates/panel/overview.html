@@ -1,0 +1,87 @@
+{% extends "global/base.html" %} {% load static %} {% block content %}
+
+<div class="lg:flex min-h-screen">
+  {% include "panel/_sidebar.html" %}
+
+  <div class="flex-1 min-w-0">
+    <main class="max-w-6xl mx-auto px-4 lg:px-8 py-8">
+      <h1 class="text-2xl font-bold text-gray-900 dark:text-gray-100 mb-1 opacity-0 animate-[fadeUp_0.5s_cubic-bezier(0.16,1,0.3,1)_0.05s_forwards] motion-reduce:animate-none motion-reduce:opacity-100">
+        Visão geral
+      </h1>
+      <p class="text-sm text-gray-500 dark:text-gray-400 mb-6 opacity-0 animate-[fadeUp_0.5s_cubic-bezier(0.16,1,0.3,1)_0.05s_forwards] motion-reduce:animate-none motion-reduce:opacity-100">
+        Números da aplicação inteira, de todos os usuários.
+      </p>
+
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 opacity-0 animate-[fadeUp_0.5s_cubic-bezier(0.16,1,0.3,1)_0.1s_forwards] motion-reduce:animate-none motion-reduce:opacity-100">
+        <div class="p-5 rounded-2xl border border-gray-100 dark:border-gray-700 border-l-4 border-l-indigo-500 bg-white dark:bg-gray-800 shadow-sm hover:shadow-md hover:-translate-y-0.5 transition-all duration-200 motion-reduce:transition-none motion-reduce:hover:translate-y-0">
+          <div class="flex items-center justify-between mb-3">
+            <div class="w-10 h-10 rounded-full bg-indigo-100 dark:bg-indigo-900/50 flex items-center justify-center">
+              <span class="material-symbols-outlined text-indigo-600 dark:text-indigo-400">group</span>
+            </div>
+            <span class="text-xs font-medium px-2 py-0.5 rounded-full bg-emerald-50 dark:bg-emerald-950 text-emerald-700 dark:text-emerald-300">
+              +{{ new_users_week }} essa semana
+            </span>
+          </div>
+          <p class="text-3xl font-bold text-gray-900 dark:text-gray-100">{{ total_users }}</p>
+          <p class="text-sm text-gray-500 dark:text-gray-400">Usuários cadastrados</p>
+        </div>
+
+        <div class="p-5 rounded-2xl border border-gray-100 dark:border-gray-700 border-l-4 border-l-emerald-500 bg-white dark:bg-gray-800 shadow-sm hover:shadow-md hover:-translate-y-0.5 transition-all duration-200 motion-reduce:transition-none motion-reduce:hover:translate-y-0">
+          <div class="w-10 h-10 rounded-full bg-emerald-100 dark:bg-emerald-900/50 flex items-center justify-center mb-3">
+            <span class="material-symbols-outlined text-emerald-600 dark:text-emerald-400">mark_email_read</span>
+          </div>
+          <p class="text-3xl font-bold text-gray-900 dark:text-gray-100">{{ verified_users }}</p>
+          <p class="text-sm text-gray-500 dark:text-gray-400">
+            E-mails verificados
+            {% if unverified_users %}<span class="text-amber-600 dark:text-amber-400">· {{ unverified_users }} pendente{{ unverified_users|pluralize:"s" }}</span>{% endif %}
+          </p>
+        </div>
+
+        <div class="p-5 rounded-2xl border border-gray-100 dark:border-gray-700 border-l-4 border-l-sky-500 bg-white dark:bg-gray-800 shadow-sm hover:shadow-md hover:-translate-y-0.5 transition-all duration-200 motion-reduce:transition-none motion-reduce:hover:translate-y-0">
+          <div class="w-10 h-10 rounded-full bg-sky-100 dark:bg-sky-900/50 flex items-center justify-center mb-3">
+            <span class="material-symbols-outlined text-sky-600 dark:text-sky-400">diversity_1</span>
+          </div>
+          <p class="text-3xl font-bold text-gray-900 dark:text-gray-100">{{ total_contacts }}</p>
+          <p class="text-sm text-gray-500 dark:text-gray-400">Contatos cadastrados</p>
+        </div>
+
+        <div class="p-5 rounded-2xl border border-gray-100 dark:border-gray-700 border-l-4 border-l-violet-500 bg-white dark:bg-gray-800 shadow-sm hover:shadow-md hover:-translate-y-0.5 transition-all duration-200 motion-reduce:transition-none motion-reduce:hover:translate-y-0">
+          <div class="w-10 h-10 rounded-full bg-violet-100 dark:bg-violet-900/50 flex items-center justify-center mb-3">
+            <span class="material-symbols-outlined text-violet-600 dark:text-violet-400">notifications_active</span>
+          </div>
+          <p class="text-3xl font-bold text-gray-900 dark:text-gray-100">{{ total_reminders }}</p>
+          <p class="text-sm text-gray-500 dark:text-gray-400">
+            Lembretes totais · <span class="text-gray-700 dark:text-gray-300 font-medium">{{ active_reminders }} ativos</span>
+          </p>
+        </div>
+      </div>
+
+      <div class="mt-4 grid grid-cols-1 sm:grid-cols-2 gap-4 opacity-0 animate-[fadeUp_0.5s_cubic-bezier(0.16,1,0.3,1)_0.15s_forwards] motion-reduce:animate-none motion-reduce:opacity-100">
+        <div class="p-5 rounded-2xl border border-gray-100 dark:border-gray-700 border-l-4 border-l-rose-500 bg-white dark:bg-gray-800 shadow-sm hover:shadow-md transition-all duration-200 flex items-center gap-4">
+          <div class="w-12 h-12 rounded-full bg-rose-100 dark:bg-rose-900/50 flex items-center justify-center flex-shrink-0">
+            <span class="material-symbols-outlined text-rose-600 dark:text-rose-400 text-2xl">cake</span>
+          </div>
+          <div>
+            <p class="text-2xl font-bold text-gray-900 dark:text-gray-100">{{ sent_this_year }}</p>
+            <p class="text-sm text-gray-500 dark:text-gray-400">E-mails de aniversário disparados em {% now "Y" %}</p>
+          </div>
+        </div>
+
+        <a
+          href="{% url 'panel:users' %}"
+          class="p-5 rounded-2xl border border-gray-100 dark:border-gray-700 border-l-4 border-l-gray-400 bg-white dark:bg-gray-800 shadow-sm hover:shadow-md transition-all duration-200 flex items-center gap-4"
+        >
+          <div class="w-12 h-12 rounded-full bg-gray-100 dark:bg-gray-700 flex items-center justify-center flex-shrink-0">
+            <span class="material-symbols-outlined text-gray-500 dark:text-gray-400 text-2xl">person_off</span>
+          </div>
+          <div>
+            <p class="text-2xl font-bold text-gray-900 dark:text-gray-100">{{ inactive_users }}</p>
+            <p class="text-sm text-gray-500 dark:text-gray-400">Contas inativas — ver em "Usuários" →</p>
+          </div>
+        </a>
+      </div>
+    </main>
+  </div>
+</div>
+
+{% endblock content %}

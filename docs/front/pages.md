@@ -84,12 +84,15 @@ a nota sobre isso em [`api/auth-flow.md`](../api/auth-flow.md#onde-isso-pode-fal
 
 ## `/accounts/profile/` — `profile/index.html`
 
-Somente leitura: usuário, e-mail, nome completo, data de criação da conta
-(`user.date_joined`). Tem uma nota fixa "Em breve você poderá editar suas
-informações de perfil." — não existe form de edição implementado ainda.
+Editável: `ProfileEditForm` (Nome + E-mail), além dos dados somente-leitura
+(usuário, data de criação). Trocar o e-mail marca `email_verified=False` no
+`Profile` e redireciona para `/accounts/verify-email/` — o motor de
+lembretes depende de um e-mail confirmado, então a troca só vale depois do
+novo código ser validado.
 
 Redesenha a mesma navbar com dropdown do dashboard (ver nota de duplicação
-em [`front/templates.md`](templates.md)).
+em [`front/templates.md`](templates.md)). O nome exibido no dropdown vem de
+`first_name`, não do `username`.
 
 ## `/` — `dashboard/index.html`
 
@@ -125,3 +128,46 @@ Um `?email_verified=1` na URL (vindo da confirmação de código no
 cadastro) dispara um toast de sucesso (`showAppToast(..., 'success')`) e
 limpa o parâmetro da URL, mesmo padrão usado no login para
 `?password_reset=1`.
+
+## Painel administrativo (`/panel/`)
+
+Três páginas, só para superusuário (ver
+[`api/routes.md`](../api/routes.md#panel-prefixo-panel-app_namepanel)),
+todas compartilhando `panel/templates/panel/_sidebar.html`:
+
+- **Desktop (`lg+`)**: sidebar fixa à esquerda (`w-64`, `sticky`), com logo,
+  os 3 links de navegação (destacado o ativo via `active_tab` no contexto),
+  e no rodapé "Voltar ao site" + "Sair".
+- **Mobile**: a sidebar vira uma barra superior compacta (logo + link "Site"
+  + link "Sair") com abas horizontais roláveis abaixo, mesmo padrão visual
+  do resto do app.
+
+### `/panel/` — `overview.html`
+
+Cards com números agregados (usuários, e-mails verificados, contatos,
+lembretes, envios do ano, contas inativas). Cada card tem uma borda
+colorida à esquerda (`border-l-4`) combinando com o ícone, e levanta
+levemente no hover (`hover:-translate-y-0.5`). O card de "Contas inativas"
+é um link direto para `/panel/users/`.
+
+### `/panel/users/` — `users.html`
+
+Tabela paginada de todos os `User` (avatar colorido via `avatar_color`,
+e-mail, verificado, status, cadastro). Barra de busca (`?q=`) + botão
+**Exportar CSV** (preserva o filtro ativo). Por linha:
+
+- Alternar ativo/inativo (`panel:user_toggle_active`) — ícone
+  `block`/`check_circle`.
+- Excluir (`panel:user_delete`) — some se o alvo for superusuário.
+- Ambas as ações somem (trocadas por "você") na própria linha do usuário
+  logado, para impedir autossabotagem.
+
+Toasts de status (`user_activated`, `user_deactivated`, `user_deleted`,
+`cannot_change_self`) chegam via query string e são lidos/limpos por um
+script inline, mesmo padrão de `?email_verified=1` no dashboard.
+
+### `/panel/reminders/` — `reminders.html`
+
+Tabela paginada e somente-leitura de todos os `Reminder` de todos os
+usuários (contato, dono, aniversário, horário/dias de aviso, status, último
+ano notificado). Mesma busca (`?q=`) e botão **Exportar CSV** dos usuários.
