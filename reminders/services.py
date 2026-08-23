@@ -14,24 +14,17 @@ logger = logging.getLogger(__name__)
 
 
 def _matching_occurrence(birthday: date, days_before: int, today: date) -> date | None:
-    """The birthday occurrence (this year's or next year's) that `today` is
-    `days_before` days ahead of, if any."""
     for year in (today.year, today.year + 1):
         try:
             occurrence = birthday.replace(year=year)
         except ValueError:
-            continue  # Feb 29 birthday, non-leap year
+            continue
         if occurrence - timedelta(days=days_before) == today:
             return occurrence
     return None
 
 
 def send_due_reminders() -> int:
-    """Checks active reminders and emails owners whose notify window has arrived.
-
-    Safe to call repeatedly (e.g. every few minutes from an external cron):
-    each reminder only fires once per calendar year via last_notified_year.
-    """
     now = timezone.localtime(timezone.now(), ZoneInfo(settings.TIME_ZONE))
     today = now.date()
     sent = 0

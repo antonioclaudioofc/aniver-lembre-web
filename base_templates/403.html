@@ -1,0 +1,35 @@
+{% extends "global/base.html" %} {% load static %} {% block content %}
+<section class="min-h-screen flex items-center justify-center px-8 py-12">
+  <div class="w-full max-w-md text-center">
+    <img
+      src="{% static 'images/logo.svg' %}"
+      alt="AniverLembre Logo"
+      class="w-20 mx-auto mb-6 opacity-0 animate-[fadeUp_0.6s_cubic-bezier(0.16,1,0.3,1)_0.05s_forwards] motion-reduce:animate-none motion-reduce:opacity-100"
+    />
+
+    <p
+      class="text-7xl font-bold text-indigo-500 mb-2 opacity-0 animate-[fadeUp_0.6s_cubic-bezier(0.16,1,0.3,1)_0.14s_forwards] motion-reduce:animate-none motion-reduce:opacity-100"
+    >
+      403
+    </p>
+    <h1
+      class="text-2xl font-bold mb-2 opacity-0 animate-[fadeUp_0.6s_cubic-bezier(0.16,1,0.3,1)_0.22s_forwards] motion-reduce:animate-none motion-reduce:opacity-100"
+    >
+      Acesso restrito
+    </h1>
+    <p
+      class="text-gray-500 dark:text-gray-400 mb-8 opacity-0 animate-[fadeUp_0.6s_cubic-bezier(0.16,1,0.3,1)_0.22s_forwards] motion-reduce:animate-none motion-reduce:opacity-100"
+    >
+      Você não tem permissão para acessar esta página.
+    </p>
+
+    <a
+      href="{% if user.is_authenticated %}{% url 'dashboard:index' %}{% else %}{% url 'accounts:login' %}{% endif %}"
+      class="inline-flex items-center gap-2 px-6 py-3 rounded-lg bg-indigo-500 hover:bg-indigo-600 text-white font-semibold transition duration-200 hover:-translate-y-0.5 hover:shadow-[0_10px_20px_-8px_rgba(79,70,229,0.45)] motion-reduce:transition-none motion-reduce:hover:translate-y-0 opacity-0 animate-[fadeUp_0.6s_cubic-bezier(0.16,1,0.3,1)_0.3s_forwards] motion-reduce:animate-none motion-reduce:opacity-100"
+    >
+      <span class="material-symbols-outlined text-lg">arrow_back</span>
+      {% if user.is_authenticated %}Voltar para o início{% else %}Voltar para o login{% endif %}
+    </a>
+  </div>
+</section>
+{% endblock content %}

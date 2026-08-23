@@ -1,56 +1,136 @@
 {% extends "global/base.html" %} {% load static %} {% block content %}
 
-<section class="min-h-screen grid grid-cols-2 max-lg:grid-cols-1">
+<section class="min-h-screen lg:h-screen lg:overflow-hidden grid grid-cols-2 max-lg:grid-cols-1">
   <div
-    class="bg-indigo-500 flex justify-center items-center flex-col gap-4 max-lg:hidden"
+    class="ambient-panel bg-indigo-500 flex justify-center items-center flex-col gap-4 max-lg:hidden lg:h-full"
   >
-    <img
-      src="{% static 'images/moments.svg' %}"
-      class="max-w-96 w-full max-h-[32rem]"
-      alt="Momentos"
-    />
-    <div class="max-w-96 text-center">
-      <h2 class="text-4xl font-bold mb-2 text-white">
-        Nunca esqueça um aniversário!
-      </h2>
-      <p class="text-gray-200">
-        Receba lembretes e celebre seus amigos e familiares com pontualidade.
-      </p>
+    <div
+      class="relative w-full max-w-md h-[34rem] max-h-[70vh] cursor-grab active:cursor-grabbing touch-pan-y select-none opacity-0 animate-[fadeUp_0.6s_cubic-bezier(0.16,1,0.3,1)_0.05s_forwards] motion-reduce:animate-none motion-reduce:opacity-100"
+      id="authCarousel"
+    >
+      <div
+        class="carousel-slide absolute inset-0 flex flex-col items-center justify-center gap-4 opacity-100 visible transition-opacity duration-[400ms] motion-reduce:transition-none"
+        data-slide
+      >
+        <img
+          src="{% static 'images/moments.svg' %}"
+          class="max-w-72 w-full max-h-72"
+          alt="Momentos"
+          draggable="false"
+        />
+        <div class="max-w-96 text-center">
+          <h2 class="text-4xl font-bold mb-2 text-white">
+            Nunca esqueça um aniversário!
+          </h2>
+          <p class="text-gray-200">
+            Receba lembretes e celebre seus amigos e familiares com
+            pontualidade.
+          </p>
+        </div>
+      </div>
+
+      <div
+        class="carousel-slide absolute inset-0 flex flex-col items-center justify-center gap-4 opacity-0 invisible transition-opacity duration-[400ms] motion-reduce:transition-none"
+        data-slide
+      >
+        <img
+          src="{% static 'images/organize-photos.svg' %}"
+          class="max-w-72 w-full max-h-72"
+          alt="Organize contatos"
+          draggable="false"
+        />
+        <div class="max-w-96 text-center">
+          <h2 class="text-4xl font-bold mb-2 text-white">
+            Organize seus contatos
+          </h2>
+          <p class="text-gray-200">
+            Cadastre aniversários, relação e observações de cada pessoa num só
+            lugar.
+          </p>
+        </div>
+      </div>
+
+      <div
+        class="carousel-slide absolute inset-0 flex flex-col items-center justify-center gap-4 opacity-0 invisible transition-opacity duration-[400ms] motion-reduce:transition-none"
+        data-slide
+      >
+        <div
+          class="w-36 h-36 rounded-full bg-white/15 flex items-center justify-center"
+        >
+          <span class="material-symbols-outlined text-white text-7xl"
+            >mark_email_read</span
+          >
+        </div>
+        <div class="max-w-96 text-center">
+          <h2 class="text-4xl font-bold mb-2 text-white">
+            Lembretes no seu horário
+          </h2>
+          <p class="text-gray-200">
+            Escolha quantos dias antes e a que horas quer ser avisado por
+            e-mail.
+          </p>
+        </div>
+      </div>
+
+      <div class="absolute inset-x-0 -bottom-2 flex justify-center gap-2">
+        <button type="button" data-dot class="carousel-dot w-6 h-2 rounded-full bg-white transition-all duration-300" aria-label="Slide 1"></button>
+        <button type="button" data-dot class="carousel-dot w-2 h-2 rounded-full bg-white/40 transition-all duration-300" aria-label="Slide 2"></button>
+        <button type="button" data-dot class="carousel-dot w-2 h-2 rounded-full bg-white/40 transition-all duration-300" aria-label="Slide 3"></button>
+      </div>
     </div>
   </div>
-  <div class="flex w-full items-center justify-center px-8 py-12">
+  <div class="w-full lg:h-full lg:overflow-y-auto">
+   <div class="min-h-full flex flex-col w-full items-center justify-center px-8 py-12">
     <div class="w-full m-auto max-w-sm">
       <img
         src="{% static 'images/logo.svg' %}"
         alt="AniverLembre Logo"
-        class="w-[8rem] max-h-[32rem] mx-auto"
+        class="w-[8rem] max-h-[32rem] mx-auto opacity-0 animate-[fadeUp_0.6s_cubic-bezier(0.16,1,0.3,1)_0.05s_forwards] motion-reduce:animate-none motion-reduce:opacity-100"
       />
-      <h2 class="text-4xl font-bold text-center max-sm:text-3xl">
+      <h2 class="text-3xl lg:text-4xl font-bold text-center mt-4 mb-1 opacity-0 animate-[fadeUp_0.6s_cubic-bezier(0.16,1,0.3,1)_0.14s_forwards] motion-reduce:animate-none motion-reduce:opacity-100">
         Crie sua conta
       </h2>
-      <p class="text-gray-500 dark:text-gray-400 text-center max-sm:text-sm mb-6">
+      <p class="text-gray-500 dark:text-gray-400 text-center text-sm mb-6 opacity-0 animate-[fadeUp_0.6s_cubic-bezier(0.16,1,0.3,1)_0.14s_forwards] motion-reduce:animate-none motion-reduce:opacity-100">
         Preencha as informações abaixo!
       </p>
 
-      <form method="POST" class="space-y-4 w-full">
-        {% csrf_token %} {% if form.non_field_errors %}
-        <div class="bg-red-100 dark:bg-red-950 text-red-700 dark:text-red-300 p-3 rounded-md text-sm">
-          {{ form.non_field_errors }}
-        </div>
-        {% endif %} {% for field in form %}
+      <form method="POST" class="space-y-4 w-full opacity-0 animate-[fadeUp_0.6s_cubic-bezier(0.16,1,0.3,1)_0.22s_forwards] motion-reduce:animate-none motion-reduce:opacity-100">
+        {% csrf_token %} {% for field in form %}
         <div class="flex flex-col">
           <label class="mb-1 font-medium text-sm text-gray-00">
             {{ field.label }}
           </label>
 
-          <input
-            type="{{ field.field.widget.input_type }}"
-            name="{{ field.name }}"
-            value="{{ field.value|default:'' }}"
-            placeholder="{% if field.name == 'username' %}Crie um nome de usuário{% elif field.name == 'email' %}Insira seu e-mail{% elif field.name == 'password' %}Insira sua senha{% elif field.name == 'confirm_password' %}Insira sua senha novamente{% elif field.name == 'first_name' %}Insira seu nome{% else %}{{ field.label }}{% endif %}"
-            class="bg-white dark:bg-gray-800 w-full text-black dark:text-white rounded-md border border-gray-200 dark:border-gray-700 px-4 py-3 text-sm transition-colors placeholder:text-gray-500 dark:placeholder:text-gray-500 outline-none focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500 disabled:cursor-not-allowed disabled:opacity-50"
-            autocomplete="{% if field.name == 'first_name' %}given-name{% elif field.name == 'username' %}username{% elif field.name == 'email' %}email{% elif field.name == 'password' or field.name == 'confirm_password' %}new-password{% endif %}"
-          />
+          <div class="relative">
+            <input
+              type="{{ field.field.widget.input_type }}"
+              name="{{ field.name }}"
+              value="{% if field.name != 'password' and field.name != 'confirm_password' %}{{ field.value|default:'' }}{% endif %}"
+              placeholder="{% if field.name == 'username' %}Crie um nome de usuário{% elif field.name == 'email' %}Insira seu e-mail{% elif field.name == 'password' %}Insira sua senha{% elif field.name == 'confirm_password' %}Insira sua senha novamente{% elif field.name == 'first_name' %}Insira seu nome{% else %}{{ field.label }}{% endif %}"
+              class="bg-white dark:bg-gray-800 w-full text-black dark:text-white rounded-md border border-gray-200 dark:border-gray-700 px-4 py-3 {% if field.name == 'password' or field.name == 'confirm_password' %}pr-11{% endif %} text-sm transition-colors placeholder:text-gray-500 dark:placeholder:text-gray-500 outline-none focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500 disabled:cursor-not-allowed disabled:opacity-50"
+              autocomplete="{% if field.name == 'first_name' %}given-name{% elif field.name == 'username' %}username{% elif field.name == 'email' %}email{% elif field.name == 'password' or field.name == 'confirm_password' %}new-password{% endif %}"
+              id="{% if field.name == 'password' %}passwordInput{% elif field.name == 'confirm_password' %}confirmPasswordInput{% endif %}"
+            />
+            {% if field.name == 'password' %}
+            <button
+              type="button"
+              id="togglePassword"
+              tabindex="-1"
+              class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-300 transition-colors"
+            >
+              <span class="material-symbols-outlined text-xl" id="togglePasswordIcon">visibility</span>
+            </button>
+            {% elif field.name == 'confirm_password' %}
+            <button
+              type="button"
+              id="toggleConfirmPassword"
+              tabindex="-1"
+              class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-300 transition-colors"
+            >
+              <span class="material-symbols-outlined text-xl" id="toggleConfirmPasswordIcon">visibility</span>
+            </button>
+            {% endif %}
+          </div>
 
           {% if field.errors %}
           <p class="text-red-600 text-sm mt-1">{{ field.errors|striptags }}</p>
@@ -61,7 +141,7 @@
         <button
           type="submit"
           id="registerBtn"
-          class="w-full bg-indigo-500 hover:bg-indigo-600 text-white py-3 rounded-lg font-semibold transition disabled:opacity-70 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+          class="w-full bg-indigo-500 hover:bg-indigo-600 text-white py-3 rounded-lg font-semibold transition duration-200 hover:-translate-y-0.5 active:translate-y-0 hover:shadow-[0_10px_20px_-8px_rgba(79,70,229,0.45)] disabled:opacity-70 disabled:cursor-not-allowed disabled:hover:translate-y-0 disabled:hover:shadow-none flex items-center justify-center gap-2 motion-reduce:transition-none motion-reduce:hover:translate-y-0"
         >
           <span
             class="material-symbols-outlined animate-spin hidden"
@@ -72,7 +152,7 @@
         </button>
       </form>
 
-      <p class="text-center text-sm text-gray-600 dark:text-gray-400 mt-4">
+      <p class="text-center text-sm text-gray-600 dark:text-gray-400 mt-4 opacity-0 animate-[fadeUp_0.6s_cubic-bezier(0.16,1,0.3,1)_0.3s_forwards] motion-reduce:animate-none motion-reduce:opacity-100">
         Já tem conta?
         <a
           href="{% url 'accounts:login' %}"
@@ -82,6 +162,7 @@
         </a>
       </p>
     </div>
+   </div>
   </div>
 </section>
 
@@ -98,6 +179,129 @@
       registerText.textContent = "Criando conta...";
     });
   }
+
+  function wirePasswordToggle(buttonId, inputId, iconId) {
+    const button = document.getElementById(buttonId);
+    const input = document.getElementById(inputId);
+    const icon = document.getElementById(iconId);
+    if (!button || !input || !icon) return;
+
+    button.addEventListener("click", () => {
+      const showing = input.type === "text";
+      input.type = showing ? "password" : "text";
+      icon.textContent = showing ? "visibility" : "visibility_off";
+    });
+  }
+
+  wirePasswordToggle("togglePassword", "passwordInput", "togglePasswordIcon");
+  wirePasswordToggle(
+    "toggleConfirmPassword",
+    "confirmPasswordInput",
+    "toggleConfirmPasswordIcon"
+  );
+
+  function initCarousel(root) {
+    if (!root) return;
+
+    const slides = root.querySelectorAll('[data-slide]');
+    const dots = root.querySelectorAll('[data-dot]');
+    const prefersReducedMotion = window.matchMedia(
+      '(prefers-reduced-motion: reduce)'
+    ).matches;
+    let index = 0;
+    let timer = null;
+
+    const widthClassOf = (el) => [...el.classList].find((c) => /^w-/.test(c));
+    const activeWidthClass = dots.length ? widthClassOf(dots[0]) : null;
+    const inactiveWidthClass = dots.length > 1 ? widthClassOf(dots[1]) : null;
+
+    function show(i) {
+      index = i;
+      slides.forEach((slide, n) => {
+        const active = n === i;
+        slide.classList.toggle('opacity-100', active);
+        slide.classList.toggle('visible', active);
+        slide.classList.toggle('opacity-0', !active);
+        slide.classList.toggle('invisible', !active);
+      });
+      dots.forEach((dot, n) => {
+        const active = n === i;
+        dot.classList.toggle('bg-white', active);
+        dot.classList.toggle('bg-white/40', !active);
+        if (activeWidthClass && inactiveWidthClass) {
+          dot.classList.remove(activeWidthClass, inactiveWidthClass);
+          dot.classList.add(active ? activeWidthClass : inactiveWidthClass);
+        }
+      });
+    }
+
+    function start() {
+      if (prefersReducedMotion || slides.length < 2) return;
+      stop();
+      timer = setInterval(() => show((index + 1) % slides.length), 2000);
+    }
+
+    function stop() {
+      if (timer) clearInterval(timer);
+    }
+
+    dots.forEach((dot, n) => {
+      dot.addEventListener('click', () => {
+        show(n);
+        start();
+      });
+    });
+
+    root.addEventListener('mouseenter', stop);
+    root.addEventListener('mouseleave', start);
+
+    if (slides.length > 1) {
+      let dragging = false;
+      let startX = 0;
+      let deltaX = 0;
+      const threshold = 40;
+
+      root.addEventListener('pointerdown', (e) => {
+        dragging = true;
+        startX = e.clientX;
+        deltaX = 0;
+        stop();
+        root.setPointerCapture(e.pointerId);
+        slides[index].style.transition = 'none';
+      });
+
+      root.addEventListener('pointermove', (e) => {
+        if (!dragging) return;
+        deltaX = e.clientX - startX;
+        slides[index].style.transform = `translateX(${deltaX}px)`;
+      });
+
+      function endDrag() {
+        if (!dragging) return;
+        dragging = false;
+        slides[index].style.transition = '';
+        slides[index].style.transform = '';
+
+        if (deltaX <= -threshold) {
+          show((index + 1) % slides.length);
+        } else if (deltaX >= threshold) {
+          show((index - 1 + slides.length) % slides.length);
+        }
+        start();
+      }
+
+      root.addEventListener('pointerup', endDrag);
+      root.addEventListener('pointercancel', endDrag);
+    }
+
+    start();
+  }
+
+  initCarousel(document.getElementById('authCarousel'));
+
+  {% if form.non_field_errors %}
+  showAppToast("{{ form.non_field_errors|striptags|escapejs }}", "danger");
+  {% endif %}
 </script>
 
 {% endblock content %}

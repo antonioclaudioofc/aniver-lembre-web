@@ -71,7 +71,11 @@ view decide o que fazer com o resultado:
 - Credenciais válidas mas `is_active=False` → reenvia um código novo e
   redireciona para `verify-email`, **sem** mostrar erro — o usuário só
   precisa terminar a verificação que não concluiu.
-- Credenciais válidas e conta ativa → login normal.
+- Credenciais válidas e conta ativa → login normal, e o destino depende de
+  `user.is_superuser`: superusuário vai direto para `panel:overview`
+  (ver [`routes.md`](routes.md#panel-prefixo-panel-app_namepanel)), qualquer
+  outro usuário vai para `/` (dashboard). O mesmo destino é usado para quem
+  já está autenticado e revisita `/accounts/login/` ou `/accounts/`.
 
 ## 4. Esqueci a senha (`accounts:password_reset_*`)
 

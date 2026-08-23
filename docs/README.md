@@ -37,6 +37,7 @@ SPA + API REST). A divisão de pastas abaixo é conceitual, não arquitetural:
 | `contacts` | model `Contact` (pessoa + data de aniversário) |
 | `reminders` | model `Reminder`, motor de disparo de e-mail, endpoint de cron |
 | `dashboard` | tela principal (CRUD combinado de contato + lembrete) |
+| `panel` | painel administrativo (visão geral, usuários, lembretes), restrito a superusuário |
 
 ## Rodando localmente
 
@@ -61,3 +62,12 @@ Variáveis de ambiente completas: [`api/environment.md`](api/environment.md).
 - [`front/templates.md`](front/templates.md) — estrutura de templates e assets
 - [`front/pages.md`](front/pages.md) — página por página
 - [`front/styling.md`](front/styling.md) — Tailwind, tema escuro, toasts, e-mails, cores de marca
+
+## Painel administrativo
+
+App `panel`, montado em `/panel/`. Todas as rotas (view por view, inclusive
+as duas de exportação CSV) passam por `@superuser_required`
+(`panel/decorators.py`): não-logado vai para o login, logado sem
+`is_superuser` recebe `403` — nenhuma delas faz redirect silencioso para
+alguém sem permissão. Ver [`api/routes.md`](api/routes.md#panel-prefixo-panel-app_namepanel)
+e [`front/pages.md`](front/pages.md#painel-administrativo-panel).

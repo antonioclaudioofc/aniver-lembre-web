@@ -1,6 +1,6 @@
-{% extends "global/base.html" %} {% load static %} {% block content %}
+{% extends "global/base.html" %} {% load static dashboard_extras %} {% block content %}
 
-<nav class="w-full border-b border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900">
+<nav class="w-full border-b border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 shadow-sm sticky top-0 z-40">
   <div class="max-w-7xl mx-auto p-4 flex items-center justify-between">
     <div
       class="flex items-center gap-3 cursor-pointer transition-opacity hover:opacity-80 text-gray-900 dark:text-gray-100"
@@ -18,10 +18,10 @@
           <div
             class="w-8 h-8 rounded-full bg-indigo-600 text-white font-semibold flex items-center justify-center flex-shrink-0"
           >
-            {{ user.username|slice:":1"|upper }}
+            {{ user.first_name|default:user.username|slice:":1"|upper }}
           </div>
           <span class="text-sm font-medium text-gray-700 dark:text-gray-300"
-            >{{ user.username }}</span
+            >{{ user.first_name|default:user.username }}</span
           >
           <span
             class="material-symbols-outlined text-gray-500 dark:text-gray-400 text-base flex-shrink-0"
@@ -44,6 +44,18 @@
             >
             Perfil
           </a>
+          {% if user.is_superuser %}
+          <a
+            href="{% url 'panel:overview' %}"
+            class="block px-4 py-2 text-sm text-indigo-700 dark:text-indigo-300 font-medium hover:bg-gray-100 dark:hover:bg-gray-700"
+          >
+            <span
+              class="material-symbols-outlined text-indigo-600 dark:text-indigo-400 text-sm align-middle mr-2"
+              >admin_panel_settings</span
+            >
+            Painel Admin
+          </a>
+          {% endif %}
           <a
             href="{% url 'accounts:logout' %}"
             class="block px-4 py-2 text-sm text-red-700 dark:text-red-400 font-medium hover:bg-gray-100 dark:hover:bg-gray-700"
@@ -59,60 +71,111 @@
     </div>
   </div>
 </nav>
-<main class="max-w-7xl mx-auto px-4 py-6">
+
+<main class="max-w-3xl mx-auto px-4 py-8">
   <a
     href="{% url 'dashboard:index' %}"
-    class="flex items-center gap-2 px-4 py-3 rounded-lg text-indigo-600 transition-colors border border-indigo-600 font-semibold transition hover:bg-indigo-600 hover:text-white block w-max mb-4"
+    class="inline-flex items-center gap-2 px-4 py-2 rounded-lg text-indigo-600 dark:text-indigo-400 transition-colors border border-indigo-600 dark:border-indigo-500 font-semibold hover:bg-indigo-600 hover:text-white dark:hover:bg-indigo-500 dark:hover:text-white mb-6 opacity-0 animate-[fadeUp_0.5s_cubic-bezier(0.16,1,0.3,1)_0.05s_forwards] motion-reduce:animate-none motion-reduce:opacity-100"
   >
     <span class="material-symbols-outlined text-lg">arrow_back</span>
     Voltar
   </a>
-  <h1 class="text-2xl font-bold mb-6 text-gray-900 dark:text-gray-100">Meu Perfil</h1>
 
-  <div class="bg-white dark:bg-gray-800 rounded border border-gray-200 dark:border-gray-700 shadow-sm p-6">
-    <div class="space-y-4">
-      <div>
-        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1"
-          >Nome de usuário</label
-        >
-        <div class="text-lg text-gray-900 dark:text-gray-100">{{ user.username }}</div>
+  <div
+    class="rounded-2xl border border-gray-100 dark:border-gray-700 shadow-sm bg-white dark:bg-gray-800 overflow-hidden opacity-0 animate-[fadeUp_0.5s_cubic-bezier(0.16,1,0.3,1)_0.1s_forwards] motion-reduce:animate-none motion-reduce:opacity-100"
+  >
+    <div class="bg-gradient-to-br from-indigo-500 to-indigo-600 px-6 py-8 flex items-center gap-4">
+      <div
+        class="w-20 h-20 rounded-full bg-{{ user.id|avatar_color }}-500 ring-4 ring-white/30 text-white font-bold text-3xl flex items-center justify-center flex-shrink-0"
+      >
+        {{ user.first_name|default:user.username|slice:":1"|upper }}
       </div>
-
-      <div>
-        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1"
-          >Email</label
-        >
-        <div class="text-lg text-gray-900 dark:text-gray-100">{{ user.email|default:"Não informado" }}</div>
-      </div>
-
-      <div>
-        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1"
-          >Nome completo</label
-        >
-        <div class="text-lg text-gray-900 dark:text-gray-100">
-          {% if user.first_name %} {{ user.first_name }}{% else %} Não informado
-          {% endif %}
-        </div>
-      </div>
-
-      <div>
-        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1"
-          >Conta criada em</label
-        >
-        <div class="text-lg text-gray-900 dark:text-gray-100">{{ user.date_joined|date:"d/m/Y" }}</div>
+      <div class="min-w-0">
+        <h1 class="text-2xl font-bold text-white truncate">
+          {{ user.first_name|default:user.username }}
+        </h1>
+        <p class="text-indigo-100 truncate">@{{ user.username }}</p>
       </div>
     </div>
 
-    <div class="mt-6 pt-6 border-t border-gray-200 dark:border-gray-700">
-      <p class="text-sm text-gray-500 dark:text-gray-400">
-        Em breve você poderá editar suas informações de perfil.
-      </p>
+    <div class="p-6 space-y-5">
+      <form method="post" class="space-y-4">
+        {% csrf_token %}
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div class="flex flex-col">
+            <label for="id_first_name" class="text-xs font-semibold text-gray-400 dark:text-gray-500 uppercase tracking-wide mb-1.5">Nome</label>
+            <input
+              type="text"
+              name="first_name"
+              id="id_first_name"
+              value="{{ form.first_name.value|default:'' }}"
+              class="w-full px-4 py-2.5 rounded-lg border border-gray-200 dark:border-gray-600 bg-white dark:bg-gray-800 text-sm text-black dark:text-white outline-none focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500"
+            />
+            {% if form.first_name.errors %}
+            <p class="text-red-600 text-xs mt-1">{{ form.first_name.errors|striptags }}</p>
+            {% endif %}
+          </div>
+
+          <div class="flex flex-col">
+            <label for="id_email" class="text-xs font-semibold text-gray-400 dark:text-gray-500 uppercase tracking-wide mb-1.5">E-mail</label>
+            <input
+              type="email"
+              name="email"
+              id="id_email"
+              value="{{ form.email.value|default:'' }}"
+              class="w-full px-4 py-2.5 rounded-lg border border-gray-200 dark:border-gray-600 bg-white dark:bg-gray-800 text-sm text-black dark:text-white outline-none focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500"
+            />
+            {% if form.email.errors %}
+            <p class="text-red-600 text-xs mt-1">{{ form.email.errors|striptags }}</p>
+            {% endif %}
+          </div>
+        </div>
+
+        <div class="flex items-center gap-2 px-3 py-2.5 rounded-lg bg-amber-50 dark:bg-amber-950/40 border border-amber-100 dark:border-amber-900">
+          <span class="material-symbols-outlined text-amber-500 dark:text-amber-400 text-lg flex-shrink-0">warning</span>
+          <p class="text-xs text-amber-700 dark:text-amber-400">
+            Se você trocar o e-mail, vamos pedir a confirmação de um código novo antes de valer pros seus lembretes.
+          </p>
+        </div>
+
+        <div class="flex justify-end">
+          <button
+            type="submit"
+            id="saveProfileBtn"
+            class="px-6 py-2.5 rounded-lg bg-indigo-600 hover:bg-indigo-700 text-white font-semibold transition duration-200 hover:-translate-y-0.5 active:translate-y-0 hover:shadow-[0_10px_20px_-8px_rgba(79,70,229,0.45)] flex items-center gap-2 disabled:opacity-70 disabled:cursor-not-allowed disabled:hover:translate-y-0 disabled:hover:shadow-none motion-reduce:transition-none motion-reduce:hover:translate-y-0"
+          >
+            <span class="material-symbols-outlined text-sm animate-spin hidden" id="saveProfileSpinner">progress_activity</span>
+            <span id="saveProfileText">Salvar alterações</span>
+          </button>
+        </div>
+      </form>
+
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        <div class="flex items-start gap-3 p-4 rounded-xl border border-gray-100 dark:border-gray-700 bg-gray-50 dark:bg-gray-900/40">
+          <div class="w-9 h-9 rounded-full bg-indigo-100 dark:bg-indigo-900/50 flex items-center justify-center flex-shrink-0">
+            <span class="material-symbols-outlined text-indigo-600 dark:text-indigo-400 text-lg">alternate_email</span>
+          </div>
+          <div class="min-w-0">
+            <p class="text-xs font-semibold text-gray-400 dark:text-gray-500 uppercase tracking-wide">Usuário</p>
+            <p class="text-gray-900 dark:text-gray-100 font-medium truncate">{{ user.username }}</p>
+          </div>
+        </div>
+
+        <div class="flex items-start gap-3 p-4 rounded-xl border border-gray-100 dark:border-gray-700 bg-gray-50 dark:bg-gray-900/40">
+          <div class="w-9 h-9 rounded-full bg-indigo-100 dark:bg-indigo-900/50 flex items-center justify-center flex-shrink-0">
+            <span class="material-symbols-outlined text-indigo-600 dark:text-indigo-400 text-lg">calendar_month</span>
+          </div>
+          <div class="min-w-0">
+            <p class="text-xs font-semibold text-gray-400 dark:text-gray-500 uppercase tracking-wide">Conta criada em</p>
+            <p class="text-gray-900 dark:text-gray-100 font-medium truncate">{{ user.date_joined|date:"d/m/Y" }}</p>
+          </div>
+        </div>
+      </div>
     </div>
   </div>
 </main>
 
 <script>
-  // Dropdown de Perfil
   const profileDropdownBtn = document.getElementById("profileDropdownBtn");
   const profileDropdown = document.getElementById("profileDropdown");
 
@@ -122,7 +185,6 @@
       profileDropdown.classList.toggle("hidden");
     });
 
-    // Fechar dropdown ao clicar fora
     document.addEventListener("click", (e) => {
       if (
         !profileDropdownBtn.contains(e.target) &&
@@ -132,6 +194,32 @@
       }
     });
   }
+
+  const saveProfileForm = document.querySelector("form");
+  const saveProfileBtn = document.getElementById("saveProfileBtn");
+  const saveProfileSpinner = document.getElementById("saveProfileSpinner");
+  const saveProfileText = document.getElementById("saveProfileText");
+
+  if (saveProfileForm && saveProfileBtn) {
+    saveProfileForm.addEventListener("submit", function () {
+      saveProfileBtn.disabled = true;
+      saveProfileSpinner.classList.remove("hidden");
+      saveProfileText.textContent = "Salvando...";
+    });
+  }
+
+  (function () {
+    const params = new URLSearchParams(window.location.search);
+    if (params.get("profile_updated") !== "1") return;
+
+    showAppToast("Perfil atualizado com sucesso!", "success");
+
+    params.delete("profile_updated");
+    const newSearch = params.toString();
+    const newUrl =
+      window.location.pathname + (newSearch ? "?" + newSearch : "");
+    window.history.replaceState({}, "", newUrl);
+  })();
 </script>
 
 {% endblock %}
