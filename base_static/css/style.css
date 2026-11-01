@@ -1,7 +1,3 @@
-/* ==========================================================
-   Tokens do redesign (aniver-lembre-specs/tokens/tokens.css)
-   As fontes são carregadas em partials/_head.html.
-   ========================================================== */
 :root {
   --night: #262163;
   --brand: #5b5bd6;
@@ -42,7 +38,6 @@
   --brand-text: #a9a6ff;
 }
 
-/* Fonte de corpo (substitui a antiga classe .inter) */
 body {
   font-family: Geist, system-ui, sans-serif;
 }
@@ -51,7 +46,6 @@ body {
   font-variation-settings: 'opsz' 48;
 }
 
-/* Textura de pontos do logo — usar só sobre --night */
 .al-dots {
   background-image: radial-gradient(
     rgba(255, 255, 255, 0.16) 2px,
@@ -60,7 +54,6 @@ body {
   background-size: 26px 26px;
 }
 
-/* Foco padrão (opt-in com a classe .al-focus) */
 .al-focus:focus-visible {
   outline: none;
   border-color: var(--brand);

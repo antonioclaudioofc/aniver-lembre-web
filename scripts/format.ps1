@@ -1,11 +1,3 @@
-<#
-.SYNOPSIS
-  Formata automaticamente o projeto (Python + CSS/JS/JSON/Markdown).
-
-.EXAMPLE
-  .\scripts\format.ps1          # formata tudo
-  .\scripts\format.ps1 -Check   # só verifica, nao altera (bom para CI)
-#>
 param([switch]$Check)
 
 $ErrorActionPreference = 'Stop'
@@ -36,9 +28,6 @@ if (Get-Command npx -ErrorAction SilentlyContinue) {
 } else {
   Write-Warning 'Node/npx nao encontrado — pulando prettier.'
 }
-
-# Templates Django (*.html) ficam de fora de propósito (veja .prettierignore):
-# reformatar classes do Tailwind gera diffs enormes.
 
 if ($failed) { Write-Error 'Formatacao pendente.'; exit 1 }
 Write-Host 'OK'

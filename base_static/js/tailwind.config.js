@@ -1,37 +1,33 @@
-// Aniver Lembre — tokens do redesign para o Tailwind via CDN.
-// Carregado em base_templates/partials/_head.html, logo depois do script do Tailwind CDN.
-// Tudo está em `extend`: as classes antigas (indigo, gray...) continuam funcionando
-// enquanto as telas migram para os tokens aos poucos.
 tailwind.config = {
   darkMode: 'class',
   theme: {
     extend: {
       colors: {
-        night: '#262163', // destaque do próximo aniversário, cabeçalhos de cadastro, item ativo do menu
+        night: '#262163',
         brand: {
-          DEFAULT: '#5B5BD6', // botões primários, foco, seleção
-          text: '#4B4BC8', // links e texto índigo sobre fundo claro
+          DEFAULT: '#5B5BD6',
+          text: '#4B4BC8',
           hover: '#4F4FC9',
-          tint: '#E4E3FB', // seleção suave, contadores
+          tint: '#E4E3FB',
         },
-        logo: '#6875F5', // apenas o símbolo
-        bg: '#F6F5FB', // fundo das páginas (lavanda)
+        logo: '#6875F5',
+        bg: '#F6F5FB',
         surface: '#FFFFFF',
-        field: '#FAFAFD', // fundo dos campos
-        soft: '#F1F0F8', // dias marcados, botões secundários
+        field: '#FAFAFD',
+        soft: '#F1F0F8',
         line: { DEFAULT: '#ECEAF5', field: '#E2E0EE' },
-        ink: '#1C1B2E', // texto principal
-        muted: '#67667A', // texto secundário (5,4:1 sobre bg)
-        'on-night': '#C9C6F2', // texto secundário sobre night
+        ink: '#1C1B2E',
+        muted: '#67667A',
+        'on-night': '#C9C6F2',
         danger: '#B4233F',
         confetti: {
           coral: '#FF7A59',
           honey: '#FFC857',
           mint: '#3CCFAE',
           lavender: '#A9A6FF',
-          'coral-light': '#FFB199', // contagem regressiva sobre night
+          'coral-light': '#FFB199',
         },
-        // Tons de contato: bg (avatar), fg (letra), dot (ponto no calendário)
+
         contact: {
           rose: { bg: '#FCE7F3', fg: '#BE185D', dot: '#EC4899' },
           teal: { bg: '#CCFBF1', fg: '#0F766E', dot: '#14B8A6' },
