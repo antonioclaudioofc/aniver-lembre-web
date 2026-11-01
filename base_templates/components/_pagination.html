@@ -1,0 +1,23 @@
+{% if page_obj.has_other_pages %}
+<nav class="mt-8 flex items-center justify-center gap-1.5" aria-label="Paginação">
+  {% if page_obj.has_previous %}
+  <a href="?page={{ page_obj.previous_page_number }}{{ page_qs }}" class="w-11 h-11 sm:w-9 sm:h-9 flex items-center justify-center rounded-full border border-[var(--line-field)] text-[var(--ink)] hover:border-brand hover:text-[var(--brand-text)] transition-colors" aria-label="Página anterior">
+    <i data-lucide="chevron-left" class="w-[18px] h-[18px]"></i>
+  </a>
+  {% endif %}
+  {% for p in pagination_range %}
+  {% if p == None %}
+  <span class="w-9 h-9 flex items-center justify-center text-[var(--muted)] select-none">…</span>
+  {% elif p == page_obj.number %}
+  <span class="w-11 h-11 sm:w-9 sm:h-9 flex items-center justify-center rounded-full bg-brand text-white text-sm font-semibold" aria-current="page">{{ p }}</span>
+  {% else %}
+  <a href="?page={{ p }}{{ page_qs }}" class="w-11 h-11 sm:w-9 sm:h-9 flex items-center justify-center rounded-full border border-[var(--line-field)] text-[var(--ink)] hover:border-brand hover:text-[var(--brand-text)] transition-colors text-sm font-medium">{{ p }}</a>
+  {% endif %}
+  {% endfor %}
+  {% if page_obj.has_next %}
+  <a href="?page={{ page_obj.next_page_number }}{{ page_qs }}" class="w-11 h-11 sm:w-9 sm:h-9 flex items-center justify-center rounded-full border border-[var(--line-field)] text-[var(--ink)] hover:border-brand hover:text-[var(--brand-text)] transition-colors" aria-label="Próxima página">
+    <i data-lucide="chevron-right" class="w-[18px] h-[18px]"></i>
+  </a>
+  {% endif %}
+</nav>
+{% endif %}

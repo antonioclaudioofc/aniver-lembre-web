@@ -1,0 +1,23 @@
+<button
+  type="button"
+  data-edit-reminder
+  data-reminder-row="{{ r.id }}"
+  {% include "dashboard/_edit_attrs.html" %}
+  aria-label="Editar aniversário de {{ r.contact.name }}"
+  class="w-full text-left flex items-center gap-3 p-4 min-h-[72px] rounded-2xl bg-[var(--surface)] shadow-outline hover:bg-[var(--soft)] transition-colors {% if not r.active %}opacity-80{% endif %}"
+>
+  {% include "components/_avatar.html" with tone=r.tone name=r.contact.name size=40 %}
+  <span class="flex-1 min-w-0">
+    <span class="block font-semibold truncate {% if not r.active %}text-[var(--muted)]{% endif %}">{{ r.contact.name }}</span>
+    <span class="block text-sm text-[var(--muted)] truncate">{{ r.contact.relationship|default:"Sem parentesco" }}</span>
+  </span>
+  <span class="text-right flex-shrink-0">
+    <span class="block font-display font-semibold">{{ r.contact.birthday|date:"d/m" }}</span>
+    <span class="block text-sm text-[var(--muted)]">
+      {% if not r.active %}pausado
+      {% elif r.days_until_birthday == 0 %}hoje
+      {% elif r.days_until_birthday == 1 %}amanhã
+      {% elif r.days_until_birthday is not None %}em {{ r.days_until_birthday }} dias{% endif %}
+    </span>
+  </span>
+</button>

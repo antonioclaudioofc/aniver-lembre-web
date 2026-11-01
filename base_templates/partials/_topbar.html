@@ -1,0 +1,88 @@
+{% load static %}
+<header class="sticky top-0 z-40 bg-[var(--bg)]/90 backdrop-blur border-b border-[var(--line)]">
+  <div class="max-w-app mx-auto px-4 sm:px-8 h-16 flex items-center justify-between gap-4">
+    <div class="flex items-center gap-6">
+      <a href="{% url 'dashboard:index' %}" class="flex items-center gap-2.5 text-[var(--ink)]" aria-label="aniverlembre, início">
+        <span class="w-9 h-9 rounded-xl bg-white shadow-outline flex items-center justify-center">
+          <img src="{% static 'images/logo.svg' %}" alt="" class="w-6 h-6" />
+        </span>
+        <span class="font-display font-bold text-xl tracking-tight max-sm:hidden">aniver<span class="text-[var(--brand-text)]">lembre</span></span>
+      </a>
+      <nav class="hidden sm:flex items-center gap-1 p-1 rounded-full bg-[var(--soft)]" aria-label="Principal">
+        <a href="{% url 'dashboard:index' %}" {% if active == 'home' %}aria-current="page"{% endif %} class="px-4 py-1.5 rounded-full text-sm font-medium transition-colors {% if active == 'home' %}bg-night text-white{% else %}text-[var(--muted)] hover:text-[var(--ink)]{% endif %}">Início</a>
+        <a href="{% url 'dashboard:people' %}" {% if active == 'people' %}aria-current="page"{% endif %} class="px-4 py-1.5 rounded-full text-sm font-medium transition-colors flex items-center gap-2 {% if active == 'people' %}bg-night text-white{% else %}text-[var(--muted)] hover:text-[var(--ink)]{% endif %}">
+          Meus aniversariantes
+          <span class="min-w-5 h-5 px-1.5 rounded-full text-xs font-semibold flex items-center justify-center {% if active == 'people' %}bg-white/20 text-white{% else %}bg-[var(--brand-tint)] text-[var(--brand-text)]{% endif %}">{{ nav_people_count|default:0 }}</span>
+        </a>
+      </nav>
+    </div>
+
+    <div class="flex items-center gap-3">
+      {% if modal %}
+      <button type="button" id="openCreateDialog" class="hidden sm:inline-flex items-center gap-2 px-5 h-11 rounded-full bg-brand hover:bg-brand-hover text-white font-medium shadow-primary transition duration-200 hover:-translate-y-0.5 active:translate-y-0">
+        <i data-lucide="plus" class="w-[18px] h-[18px]"></i>
+        Novo aniversário
+      </button>
+      {% else %}
+      <a href="{% url 'dashboard:index' %}?new=1" class="hidden sm:inline-flex items-center gap-2 px-5 h-11 rounded-full bg-brand hover:bg-brand-hover text-white font-medium shadow-primary transition duration-200 hover:-translate-y-0.5 active:translate-y-0">
+        <i data-lucide="plus" class="w-[18px] h-[18px]"></i>
+        Novo aniversário
+      </a>
+      {% endif %}
+
+      <div class="relative">
+        <button id="profileDropdownBtn" type="button" aria-label="Menu da conta" aria-haspopup="menu" aria-expanded="false" class="flex items-center gap-2 h-11 pl-1 pr-3 rounded-full hover:bg-[var(--soft)] outline-none focus-visible:shadow-focus transition-colors">
+          <span class="w-9 h-9 rounded-full bg-brand text-white font-semibold flex items-center justify-center">{{ user.first_name|default:user.username|slice:":1"|upper }}</span>
+          <i data-lucide="chevron-down" class="w-4 h-4 text-[var(--muted)] max-sm:hidden"></i>
+        </button>
+        <div id="profileDropdown" role="menu" class="hidden absolute right-0 mt-2 w-56 bg-[var(--surface)] rounded-2xl shadow-modal py-2 border border-[var(--line)] z-50">
+          <div class="px-4 pb-2 mb-1 border-b border-[var(--line)]">
+            <p class="text-sm font-semibold text-[var(--ink)] truncate">{{ user.first_name|default:user.username }}</p>
+            <p class="text-xs text-[var(--muted)] truncate">{{ user.email }}</p>
+          </div>
+          <a role="menuitem" href="{% url 'accounts:profile' %}" class="flex items-center gap-3 px-4 py-2.5 text-sm text-[var(--ink)] font-medium hover:bg-[var(--soft)]">
+            <i data-lucide="user" class="w-4 h-4 text-[var(--muted)]"></i>
+            Perfil
+          </a>
+          {% if user.is_superuser %}
+          <a role="menuitem" href="{% url 'panel:overview' %}" class="flex items-center gap-3 px-4 py-2.5 text-sm text-[var(--brand-text)] font-medium hover:bg-[var(--soft)]">
+            <i data-lucide="shield-check" class="w-4 h-4"></i>
+            Painel Admin
+          </a>
+          {% endif %}
+          <button role="menuitem" type="button" data-theme-toggle class="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-[var(--ink)] font-medium hover:bg-[var(--soft)]">
+            <i data-lucide="moon" class="w-4 h-4 text-[var(--muted)] dark:hidden"></i>
+            <i data-lucide="sun" class="w-4 h-4 text-[var(--muted)] hidden dark:inline"></i>
+            <span class="dark:hidden">Tema escuro</span>
+            <span class="hidden dark:inline">Tema claro</span>
+          </button>
+          <a role="menuitem" href="{% url 'accounts:logout' %}" class="flex items-center gap-3 px-4 py-2.5 text-sm text-[var(--danger)] font-medium hover:bg-[var(--soft)]">
+            <i data-lucide="log-out" class="w-4 h-4"></i>
+            Sair
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+</header>
+
+<nav class="sm:hidden fixed bottom-4 inset-x-4 z-40 h-16 rounded-full bg-[var(--ink)] text-[var(--surface)] shadow-modal flex items-center justify-around px-2" aria-label="Navegação móvel">
+  <a href="{% url 'dashboard:index' %}" class="flex flex-col items-center justify-center w-14 h-12 rounded-full text-[10px] font-medium gap-0.5 {% if active == 'home' %}opacity-100{% else %}opacity-60{% endif %}" aria-label="Início" {% if active == 'home' %}aria-current="page"{% endif %}>
+    <i data-lucide="house" class="w-5 h-5"></i>Início
+  </a>
+  <a href="{% url 'dashboard:people' %}" class="flex flex-col items-center justify-center w-14 h-12 rounded-full text-[10px] font-medium gap-0.5 {% if active == 'people' %}opacity-100{% else %}opacity-60{% endif %}" aria-label="Meus aniversariantes" {% if active == 'people' %}aria-current="page"{% endif %}>
+    <i data-lucide="users" class="w-5 h-5"></i>Pessoas
+  </a>
+  {% if modal %}
+  <button type="button" data-open-create aria-label="Novo aniversário" class="w-14 h-14 -mt-6 rounded-full bg-brand text-white shadow-primary flex items-center justify-center">
+    <i data-lucide="plus" class="w-6 h-6"></i>
+  </button>
+  {% else %}
+  <a href="{% url 'dashboard:index' %}?new=1" aria-label="Novo aniversário" class="w-14 h-14 -mt-6 rounded-full bg-brand text-white shadow-primary flex items-center justify-center">
+    <i data-lucide="plus" class="w-6 h-6"></i>
+  </a>
+  {% endif %}
+  <a href="{% url 'accounts:profile' %}" class="flex flex-col items-center justify-center w-14 h-12 rounded-full text-[10px] font-medium gap-0.5 {% if active == 'profile' %}opacity-100{% else %}opacity-60{% endif %}" aria-label="Perfil" {% if active == 'profile' %}aria-current="page"{% endif %}>
+    <i data-lucide="user" class="w-5 h-5"></i>Perfil
+  </a>
+</nav>

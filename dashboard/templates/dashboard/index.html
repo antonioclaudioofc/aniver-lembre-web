@@ -1,710 +1,284 @@
-{% extends "global/base.html" %} {% load static dashboard_extras %} {% block content %}
+{% extends "global/base.html" %}
+{% load static %}
+{% block floating_theme %}{% endblock floating_theme %}
+{% block content %}
 
-<nav class="w-full border-b border-[var(--line)] bg-[var(--surface)] sticky top-0 z-40">
-  <div class="max-w-7xl mx-auto p-4 flex items-center justify-between">
-    <div
-      class="flex items-center gap-3 cursor-pointer transition-opacity hover:opacity-80 text-[var(--ink)]"
-      onclick="location.href='{% url 'dashboard:index' %}'"
-    >
-      <img src="{% static 'images/logo.svg' %}" alt="Logo" class="w-8 h-8" />
-      <span class="font-display font-bold text-xl tracking-tight max-md:hidden">aniver<span class="text-[var(--brand-text)]">lembre</span></span>
-    </div>
-    <div class="flex items-center gap-2">
-      <div class="relative">
-        <button
-          id="profileDropdownBtn"
-          class="flex items-center gap-2 px-3 py-2 rounded-full hover:bg-[var(--soft)] outline-none focus-visible:shadow-focus transition-colors"
-        >
-          <div
-            class="w-8 h-8 rounded-full bg-brand text-white font-semibold flex items-center justify-center flex-shrink-0"
-          >
-            {{ user.first_name|default:user.username|slice:":1"|upper }}
-          </div>
-          <span class="text-sm font-medium text-[var(--ink)]"
-            >{{ user.first_name|default:user.username }}</span
-          >
-          <span
-            class="material-symbols-outlined text-[var(--muted)] text-base flex-shrink-0"
-          >
-            expand_more
-          </span>
-        </button>
+{% include "partials/_topbar.html" with active="home" modal=True %}
 
-        <div
-          id="profileDropdown"
-          class="hidden absolute right-0 mt-2 w-48 bg-[var(--surface)] rounded-2xl shadow-modal py-1 border border-[var(--line)] z-50"
-        >
-          <a
-            href="{% url 'accounts:profile' %}"
-            class="block px-4 py-2 text-sm text-[var(--ink)] font-medium hover:bg-[var(--soft)]"
+<main class="max-w-app mx-auto px-4 sm:px-8 pt-8 pb-32 sm:pb-16 space-y-10">
+  <header>
+    <p class="text-[13px] text-[var(--muted)] capitalize">{{ weekday }}, {{ today|date:"j \d\e F" }}</p>
+    <h1 class="font-display text-3xl sm:text-page font-semibold tracking-tight">Olá, {{ user.first_name|default:user.username }}</h1>
+  </header>
+
+  <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+    <section class="relative overflow-hidden rounded-[28px] bg-night al-dots text-white p-6 sm:p-8 lg:col-span-7 min-h-[280px] flex" aria-label="Próximo aniversário">
+      <span class="al-confetti" style="width: 12px; height: 12px; top: 28px; right: 64px; background: var(--coral)"></span>
+      <span class="al-confetti" style="width: 8px; height: 8px; top: 76px; right: 120px; background: var(--honey)"></span>
+      <span class="al-confetti" style="width: 10px; height: 10px; bottom: 36px; right: 44px; background: var(--mint)"></span>
+      <span class="al-confetti" style="width: 7px; height: 7px; bottom: 90px; right: 150px; background: var(--lavender)"></span>
+
+      {% if featured %}
+      {% with r=featured %}
+      <div class="relative flex flex-col sm:flex-row sm:items-center gap-6 w-full">
+        {% if r.days_until_birthday == 0 %}
+        {% include "components/_date_stamp.html" with size=104 month=r.stamp_month day=r.stamp_day variant="today" %}
+        {% else %}
+        {% include "components/_date_stamp.html" with size=104 month=r.stamp_month day=r.stamp_day %}
+        {% endif %}
+        <div class="min-w-0 flex-1">
+          <p class="text-xs uppercase tracking-widest text-[var(--on-night)] mb-2">
+            {% if r.days_until_birthday == 0 %}Hoje é o dia!{% else %}Próximo aniversário{% endif %}
+          </p>
+          <h2 class="font-display text-4xl sm:text-hero font-semibold tracking-tight break-words">{{ r.contact.name }}</h2>
+          <p class="mt-2 text-[var(--on-night)]">
+            Faz {{ r.turning_age }} ano{{ r.turning_age|pluralize:"s" }}{% if r.contact.relationship %} · {{ r.contact.relationship }}{% endif %}
+          </p>
+          <p class="mt-4 font-display text-2xl font-semibold text-confetti-coral-light">
+            {% if r.days_until_birthday == 0 %}É hoje{% elif r.days_until_birthday == 1 %}Amanhã{% else %}Em {{ r.days_until_birthday }} dias{% endif %}
+          </p>
+          <p class="mt-1 text-sm text-[var(--on-night)]">
+            {% if r.notify_date and r.notify_date >= today %}Aviso por e-mail em {{ r.notify_date|date:"d/m" }} às {{ r.notify_at|time:"H:i" }}{% else %}Aviso por e-mail já enviado ou no horário de hoje ({{ r.notify_at|time:"H:i" }}){% endif %}
+          </p>
+          <button
+            type="button"
+            data-edit-reminder
+            data-reminder-row="{{ r.id }}"
+            {% include "dashboard/_edit_attrs.html" %}
+            class="mt-5 inline-flex items-center gap-2 px-5 h-11 rounded-full bg-white/10 hover:bg-white/20 text-white font-medium transition-colors"
           >
-            <span
-              class="material-symbols-outlined text-[var(--muted)] text-sm align-middle mr-2"
-              >person</span
-            >
-            Perfil
-          </a>
-          {% if user.is_superuser %}
-          <a
-            href="{% url 'panel:overview' %}"
-            class="block px-4 py-2 text-sm text-[var(--brand-text)] font-medium hover:bg-[var(--soft)]"
-          >
-            <span
-              class="material-symbols-outlined text-[var(--brand-text)] text-sm align-middle mr-2"
-              >admin_panel_settings</span
-            >
-            Painel Admin
-          </a>
-          {% endif %}
-          <a
-            href="{% url 'accounts:logout' %}"
-            class="block px-4 py-2 text-sm text-[var(--danger)] font-medium hover:bg-[var(--soft)]"
-          >
-            <span
-              class="material-symbols-outlined text-[var(--danger)] text-sm align-middle mr-2"
-              >logout</span
-            >
-            Sair
-          </a>
+            <i data-lucide="pencil" class="w-4 h-4"></i>
+            Editar
+          </button>
         </div>
       </div>
-    </div>
-  </div>
-</nav>
-
-<main class="max-w-7xl mx-auto px-4 py-6">
-  <div class="flex items-center justify-between mb-6 gap-3 flex-wrap">
-    <div>
-      <h1 class="font-display text-3xl font-semibold tracking-tight text-[var(--ink)]">Seus Lembretes</h1>
-      <p class="text-sm text-[var(--muted)] mt-0.5">
-        {{ page_obj.paginator.count }} lembrete{{ page_obj.paginator.count|pluralize:"s" }}
-      </p>
-    </div>
-    <button
-      id="openCreateDialog"
-      class="flex items-center gap-2 px-4 py-2 rounded-full bg-brand hover:bg-brand-hover text-white font-medium shadow-primary transition duration-200 hover:-translate-y-0.5 active:translate-y-0 motion-reduce:transition-none motion-reduce:hover:translate-y-0"
-    >
-      <span class="material-symbols-outlined text-lg">add_circle</span>
-      Novo Lembrete
-    </button>
-  </div>
-
-  <div class="mb-6 p-4 rounded-3xl bg-[var(--surface)] shadow-outline space-y-3">
-    <form method="get" class="flex items-center gap-3">
-      <div class="relative flex-1 max-w-2xl">
-        <span class="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-[var(--muted)] text-xl pointer-events-none">search</span>
-        <input
-          type="text"
-          name="q"
-          value="{{ search_query }}"
-          placeholder="Buscar por nome..."
-          class="w-full pl-12 pr-4 py-3.5 rounded-field border border-[var(--line-field)] bg-[var(--field)] text-base text-[var(--ink)] placeholder:text-[var(--muted)] outline-none focus:border-brand focus:shadow-focus"
-        />
-        {% if selected_month %}<input type="hidden" name="month" value="{{ selected_month }}" />{% endif %}
+      {% endwith %}
+      {% else %}
+      <div class="relative flex flex-col justify-center gap-3 w-full">
+        <p class="text-xs uppercase tracking-widest text-[var(--on-night)]">Próximo aniversário</p>
+        <h2 class="font-display text-3xl font-semibold tracking-tight">Nenhum aniversário ativo ainda</h2>
+        <p class="text-[var(--on-night)] max-w-md">Cadastre alguém e a gente avisa por e-mail quando estiver chegando.</p>
+        <div>
+          <button type="button" data-open-create class="inline-flex items-center gap-2 px-5 h-11 rounded-full bg-white text-[var(--night)] font-medium hover:bg-white/90 transition-colors">
+            <i data-lucide="plus" class="w-[18px] h-[18px]"></i>
+            Novo aniversário
+          </button>
+        </div>
       </div>
-      {% if search_query or selected_month %}
-      <a
-        href="{% url 'dashboard:index' %}"
-        class="flex-shrink-0 flex items-center gap-1 px-3 py-2 rounded-lg border border-red-200 dark:border-red-800 text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-950 hover:border-red-300 dark:hover:border-red-600 transition-colors text-sm font-medium whitespace-nowrap"
-      >
-        <span class="material-symbols-outlined text-base">filter_alt_off</span>
-        Limpar filtros
-      </a>
       {% endif %}
-    </form>
+    </section>
 
-    <div class="flex items-center gap-2 overflow-x-auto pb-1 -mx-1 px-1">
-      <span class="flex-shrink-0 text-xs font-semibold text-[var(--muted)] uppercase tracking-wide pr-1">Mês</span>
-      <a
-        href="?{{ all_months_qs }}"
-        class="flex-shrink-0 px-3 py-1.5 rounded-full text-sm font-medium border transition-colors {% if not selected_month %}bg-brand border-brand text-white{% else %}border-[var(--line-field)] text-[var(--ink)] hover:border-brand{% endif %}"
-        >Todos</a
+    <section class="rounded-[28px] bg-[var(--surface)] shadow-outline p-5 sm:p-6 lg:col-span-5" aria-label="Calendário">
+      <div class="flex items-center justify-between mb-4">
+        <h2 id="calLabel" class="font-display text-section font-semibold tracking-tight" aria-live="polite"></h2>
+        <div class="flex items-center gap-1">
+          <button type="button" id="calPrev" aria-label="Mês anterior" class="w-11 h-11 rounded-full flex items-center justify-center text-[var(--ink)] hover:bg-[var(--soft)] disabled:opacity-30 disabled:hover:bg-transparent transition-colors">
+            <i data-lucide="chevron-left" class="w-5 h-5"></i>
+          </button>
+          <button type="button" id="calNext" aria-label="Próximo mês" class="w-11 h-11 rounded-full flex items-center justify-center text-[var(--ink)] hover:bg-[var(--soft)] disabled:opacity-30 disabled:hover:bg-transparent transition-colors">
+            <i data-lucide="chevron-right" class="w-5 h-5"></i>
+          </button>
+        </div>
+      </div>
+      <div class="grid grid-cols-7 gap-1 mb-1 text-center text-xs font-medium text-[var(--muted)]" aria-hidden="true">
+        <span>D</span><span>S</span><span>T</span><span>Q</span><span>Q</span><span>S</span><span>S</span>
+      </div>
+      <div id="calGrid" class="grid grid-cols-7 gap-1"></div>
+      <div id="calDetail" class="mt-4 pt-4 border-t border-[var(--line)] text-sm text-[var(--muted)]" aria-live="polite">
+        Escolha um dia marcado para ver quem faz aniversário.
+      </div>
+    </section>
+  </div>
+
+  {% if upcoming %}
+  <section class="sm:hidden" aria-label="Em breve">
+    <h2 class="font-display text-section font-semibold tracking-tight mb-3">Em breve</h2>
+    <div class="flex gap-3 overflow-x-auto -mx-4 px-4 pb-2 snap-x">
+      {% for r in upcoming %}
+      <button
+        type="button"
+        data-edit-reminder
+        {% include "dashboard/_edit_attrs.html" %}
+        class="snap-start flex-shrink-0 w-40 text-left p-4 rounded-2xl bg-[var(--surface)] shadow-outline flex flex-col gap-3"
       >
-      {% for m in months %}
-      <a
-        href="?{{ m.qs }}"
-        class="flex-shrink-0 px-3 py-1.5 rounded-full text-sm font-medium border transition-colors {% if selected_month == m.number %}bg-brand border-brand text-white{% elif m.count %}border-[var(--line-field)] text-[var(--ink)] hover:border-brand{% else %}border-[var(--line)] text-[var(--muted)] opacity-60 hover:border-[var(--line-field)]{% endif %}"
-        >{{ m.label }}{% if m.count %} <span class="{% if selected_month == m.number %}text-white/70{% else %}text-[var(--muted)]{% endif %}">{{ m.count }}</span>{% endif %}</a
-      >
+        {% if r.days_until_birthday == 0 %}
+        {% include "components/_date_stamp.html" with size=48 month=r.stamp_month day=r.stamp_day variant="today" %}
+        {% elif r.days_until_birthday <= 14 %}
+        {% include "components/_date_stamp.html" with size=48 month=r.stamp_month day=r.stamp_day %}
+        {% else %}
+        {% include "components/_date_stamp.html" with size=48 month=r.stamp_month day=r.stamp_day variant="soft" %}
+        {% endif %}
+        <span>
+          <span class="block font-semibold truncate">{{ r.contact.name }}</span>
+          <span class="block text-sm text-[var(--muted)]">{% if r.days_until_birthday == 0 %}hoje{% elif r.days_until_birthday == 1 %}amanhã{% else %}em {{ r.days_until_birthday }} dias{% endif %}</span>
+        </span>
+      </button>
       {% endfor %}
     </div>
-  </div>
+  </section>
+  {% endif %}
 
-  {% if page_obj %}
-  <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 opacity-0 animate-[fadeUp_0.5s_cubic-bezier(0.16,1,0.3,1)_forwards] motion-reduce:animate-none motion-reduce:opacity-100">
-    {% for r in reminders %}
-    {% with tone=r.contact.id|avatar_tone %}
-    <div
-      class="group relative rounded-3xl bg-[var(--surface)] shadow-outline overflow-hidden transition-all duration-200 hover:bg-[var(--soft)] hover:-translate-y-0.5 motion-reduce:transition-none motion-reduce:hover:translate-y-0"
-      data-reminder-card
-    >
-      <div class="relative p-5 space-y-3">
-        <div class="flex items-start justify-between gap-3">
-          <div class="flex items-center gap-3">
-            <div class="w-10 h-10 rounded-full bg-contact-{{ tone }}-bg text-contact-{{ tone }}-fg font-semibold flex items-center justify-center flex-shrink-0">
-              {{ r.contact.name|slice:":1"|upper }}
-            </div>
-            <div>
-              <h3 class="font-semibold text-[var(--ink)]">{{ r.contact.name }}</h3>
-              <p class="text-sm text-[var(--muted)] flex items-center gap-1">
-                <span class="material-symbols-outlined text-base text-[var(--brand-text)]">cake</span>
-                {{ r.contact.birthday|date:"d/m" }}
-                {% if r.days_until_birthday is not None %}
-                <span>
-                  ·
-                  {% if r.days_until_birthday == 0 %}é hoje!
-                  {% elif r.days_until_birthday == 1 %}amanhã
-                  {% else %}em {{ r.days_until_birthday }} dias{% endif %}
-                </span>
-                {% endif %}
-              </p>
-            </div>
-          </div>
-          <span
-            class="flex-shrink-0 text-xs px-2 py-1 rounded-full border {{ r.active|yesno:'bg-[var(--brand-tint)] text-[var(--brand-text)] border-transparent,bg-[var(--soft)] text-[var(--muted)] border-[var(--line)]' }}"
-            >{{ r.active|yesno:'Ativo,Inativo' }}</span
-          >
-        </div>
-
-        {% if r.contact.relationship or r.contact.notes %}
-        <div class="text-sm text-[var(--ink)] space-y-1">
-          {% if r.contact.relationship %}
-          <p class="flex items-center gap-2 text-[var(--muted)]">
-            <span class="material-symbols-outlined text-base text-[var(--brand-text)]">diversity_1</span>
-            {{ r.contact.relationship }}
-          </p>
-          {% endif %}
-          {% if r.contact.notes %}
-          <p class="flex items-start gap-2 text-[var(--muted)]">
-            <span class="material-symbols-outlined text-base text-[var(--brand-text)] mt-0.5">notes</span>
-            <span class="line-clamp-2">{{ r.contact.notes }}</span>
-          </p>
-          {% endif %}
-        </div>
-        {% endif %}
-
-        <div class="flex items-center justify-between pt-3 border-t border-[var(--line)] text-sm">
-          <div class="flex flex-col text-[var(--ink)]">
-            <span class="flex items-center gap-1">
-              <span class="material-symbols-outlined text-base text-[var(--brand-text)]">notifications_active</span>
-              {{ r.notify_at|time:"H:i" }}
-            </span>
-            <span class="text-[var(--muted)]">{{ r.days_before }} dia{{ r.days_before|pluralize:"s" }} antes</span>
-          </div>
-          <div class="flex items-center gap-1.5">
-            <button
-              type="button"
-              title="Editar"
-              aria-label="Editar lembrete de {{ r.contact.name }}"
-              class="w-9 h-9 flex items-center justify-center rounded-full border border-[var(--line-field)] text-[var(--muted)] hover:border-brand hover:text-[var(--brand-text)] hover:bg-[var(--brand-tint)] transition-colors"
-              data-edit-reminder
-              data-reminder-id="{{ r.id }}"
-              data-name="{{ r.contact.name|escape }}"
-              data-birthday="{{ r.contact.birthday|date:'Y-m-d' }}"
-              data-relationship="{{ r.contact.relationship|default_if_none:''|escape }}"
-              data-notes="{{ r.contact.notes|default_if_none:''|escape }}"
-              data-days-before="{{ r.days_before }}"
-              data-notify-at="{{ r.notify_at|time:'H:i' }}"
-              data-active="{{ r.active }}"
-            >
-              <span class="material-symbols-outlined text-lg">edit</span>
-            </button>
-
-            <form
-              method="post"
-              action="{% url 'dashboard:delete_reminder' r.id %}"
-              data-delete-form
-              data-name="{{ r.contact.name|escape }}"
-            >
-              {% csrf_token %}
-              <input type="hidden" name="page" value="{{ page_obj.number }}" />
-              <button
-                type="submit"
-                title="Excluir"
-                aria-label="Excluir lembrete de {{ r.contact.name }}"
-                class="w-9 h-9 flex items-center justify-center rounded-full border border-[var(--line-field)] text-[var(--danger)] hover:border-[var(--danger)] transition-colors"
-              >
-                <span class="material-symbols-outlined text-lg">delete</span>
-              </button>
-            </form>
-          </div>
-        </div>
+  <section aria-labelledby="peopleTitle">
+    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-5">
+      <div class="flex items-center gap-3">
+        <h2 id="peopleTitle" class="font-display text-section font-semibold tracking-tight">Meus aniversariantes</h2>
+        <span class="min-w-6 h-6 px-2 rounded-full bg-[var(--brand-tint)] text-[var(--brand-text)] text-sm font-semibold flex items-center justify-center">{{ total_people }}</span>
+      </div>
+      <div class="flex flex-col sm:flex-row gap-3 sm:items-center">
+        <form method="get" action="{% url 'dashboard:index' %}" role="search" class="relative">
+          <i data-lucide="search" class="w-[18px] h-[18px] absolute left-4 top-1/2 -translate-y-1/2 text-[var(--muted)] pointer-events-none"></i>
+          <label for="homeSearch" class="sr-only">Buscar por nome</label>
+          <input
+            id="homeSearch"
+            data-search
+            type="search"
+            name="q"
+            value="{{ search_query }}"
+            placeholder="Buscar por nome"
+            autocomplete="off"
+            class="w-full sm:w-72 h-12 pl-11 pr-14 rounded-field border border-[var(--line-field)] bg-[var(--field)] text-base sm:text-[15px] text-[var(--ink)] placeholder:text-[var(--muted)] outline-none focus:border-brand focus:shadow-focus"
+          />
+          <kbd class="max-sm:hidden absolute right-3 top-1/2 -translate-y-1/2 text-xs text-[var(--muted)] px-1.5 py-0.5 rounded-md bg-[var(--soft)]">Ctrl K</kbd>
+        </form>
+        <a href="{% url 'dashboard:people' %}" class="inline-flex items-center justify-center gap-2 px-5 h-12 rounded-full bg-[var(--ink)] text-[var(--surface)] font-medium hover:opacity-90 transition-opacity">
+          <i data-lucide="users" class="w-[18px] h-[18px]"></i>
+          Gerenciar aniversariantes
+        </a>
       </div>
     </div>
-    {% endwith %}
-    {% endfor %}
-  </div>
 
-  {% if page_obj.has_other_pages %}
-  <nav class="mt-8 flex items-center justify-center gap-1.5" aria-label="Paginação">
-    {% if page_obj.has_previous %}
-    <a
-      href="?page={{ page_obj.previous_page_number }}{{ page_qs }}"
-      class="w-9 h-9 flex items-center justify-center rounded-full border border-[var(--line-field)] text-[var(--ink)] hover:border-brand hover:text-[var(--brand-text)] transition-colors"
-      aria-label="Página anterior"
-    >
-      <span class="material-symbols-outlined text-lg">chevron_left</span>
-    </a>
-    {% endif %}
-
-    {% for p in pagination_range %}
-    {% if p == None %}
-    <span class="w-9 h-9 flex items-center justify-center text-[var(--muted)] select-none">…</span>
-    {% elif p == page_obj.number %}
-    <span
-      class="w-9 h-9 flex items-center justify-center rounded-full bg-brand text-white text-sm font-semibold"
-      aria-current="page"
-      >{{ p }}</span
-    >
+    {% if people %}
+    <div data-list class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-3">
+      {% for r in people %}
+      {% include "dashboard/_person_row.html" %}
+      {% endfor %}
+    </div>
+    {% elif search_query %}
+    {% url 'dashboard:index' as clear_url %}
+    {% include "components/_empty_state.html" with title="Ninguém encontrado" text="Nenhum aniversariante com esse nome." action_url=clear_url action_label="Limpar busca" %}
     {% else %}
-    <a
-      href="?page={{ p }}{{ page_qs }}"
-      class="w-9 h-9 flex items-center justify-center rounded-full border border-[var(--line-field)] text-[var(--ink)] hover:border-brand hover:text-[var(--brand-text)] transition-colors text-sm font-medium"
-      >{{ p }}</a
-    >
+    {% include "components/_empty_state.html" with title="Nenhum aniversário cadastrado" text="Cadastre o primeiro e receba um aviso antes da data." action_button="Novo aniversário" %}
     {% endif %}
-    {% endfor %}
-
-    {% if page_obj.has_next %}
-    <a
-      href="?page={{ page_obj.next_page_number }}{{ page_qs }}"
-      class="w-9 h-9 flex items-center justify-center rounded-full border border-[var(--line-field)] text-[var(--ink)] hover:border-brand hover:text-[var(--brand-text)] transition-colors"
-      aria-label="Próxima página"
-    >
-      <span class="material-symbols-outlined text-lg">chevron_right</span>
-    </a>
-    {% endif %}
-  </nav>
-  {% endif %}
-
-  {% else %}
-  <div class="text-center py-16">
-    <span class="material-symbols-outlined text-5xl text-[var(--muted)] opacity-50 mb-3 block">
-      {% if search_query or selected_month %}search_off{% else %}cake{% endif %}
-    </span>
-    {% if search_query or selected_month %}
-    <p class="text-[var(--muted)] mb-1">Nenhum lembrete encontrado.</p>
-    <a href="{% url 'dashboard:index' %}" class="text-[var(--brand-text)] hover:underline text-sm font-medium">Limpar filtros</a>
-    {% else %}
-    <p class="text-[var(--muted)]">Você ainda não tem lembretes. Crie o primeiro!</p>
-    {% endif %}
-  </div>
-  {% endif %}
+  </section>
 </main>
 
-<dialog
-  id="createDialog"
-  class="rounded-[28px] max-w-2xl w-5/6 p-0 bg-transparent backdrop:bg-[#262163]/50 backdrop:backdrop-blur-sm m-auto"
->
-  <div
-    id="createDialogPanel"
-    class="bg-[var(--surface)] text-[var(--ink)] rounded-[28px] shadow-modal opacity-0 scale-95 transition-all duration-200 motion-reduce:transition-none motion-reduce:opacity-100 motion-reduce:scale-100 max-h-[85vh] overflow-y-auto"
-  >
-    <div class="sticky top-0 z-10 flex justify-between items-center px-6 py-5 bg-night al-dots rounded-t-[28px]">
-      <h3 class="font-display text-2xl font-semibold tracking-tight text-white" id="dialogTitle">{% if is_editing %}Editar Lembrete{% else %}Novo Lembrete{% endif %}</h3>
-      <button
-        id="closeCreateDialog"
-        type="button"
-        aria-label="Fechar"
-        class="w-9 h-9 flex items-center justify-center rounded-full text-[var(--on-night)] hover:text-white hover:bg-white/10 transition-colors"
-      >
-        <span class="material-symbols-outlined">close</span>
-      </button>
-    </div>
-    <form
-      method="post"
-      action="{% url 'dashboard:create_reminder' %}"
-      class="px-6 py-5 space-y-4"
-    >
-      {% csrf_token %}
-      <input type="hidden" name="reminder_id" id="reminderIdField" value="{{ current_reminder_id|default:'' }}" />
-      <input type="hidden" name="page" value="{{ page_obj.number }}" />
+{% include "dashboard/_reminder_modal.html" %}
 
-      <div class="space-y-4 p-5 rounded-3xl bg-[var(--soft)]">
-        <div class="flex items-center gap-2.5">
-          <div class="w-8 h-8 rounded-full bg-[var(--brand-tint)] flex items-center justify-center flex-shrink-0">
-            <span class="material-symbols-outlined text-[var(--brand-text)] text-lg">person</span>
-          </div>
-          <h4 class="font-display text-lg font-semibold text-[var(--ink)]">
-            Informações do Contato
-          </h4>
-        </div>
-
-        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-          <div class="flex flex-col">
-            <label class="mb-1 font-medium text-sm text-[var(--ink)]"
-              >{{ contact_form.name.label }} *</label
-            >
-            {{ contact_form.name }} {% if contact_form.name.errors %}
-            <div class="text-[var(--danger)] text-sm mt-1">
-              {% for error in contact_form.name.errors %}
-              <p>{{ error }}</p>
-              {% endfor %}
-            </div>
-            {% endif %}
-          </div>
-
-          <div class="flex flex-col">
-            <label class="mb-1 font-medium text-sm text-[var(--ink)]"
-              >{{ contact_form.birthday.label }} *</label
-            >
-            {{ contact_form.birthday }} {% if contact_form.birthday.errors %}
-            <div class="text-[var(--danger)] text-sm mt-1">
-              {% for error in contact_form.birthday.errors %}
-              <p>{{ error }}</p>
-              {% endfor %}
-            </div>
-            {% endif %}
-          </div>
-
-          <div class="flex flex-col sm:col-span-2">
-            <label class="mb-1 font-medium text-sm text-[var(--ink)]"
-              >{{ contact_form.relationship.label }}</label
-            >
-            {{ contact_form.relationship }}
-            {% if contact_form.relationship.errors %}
-            <div class="text-[var(--danger)] text-sm mt-1">
-              {% for error in contact_form.relationship.errors %}
-              <p>{{ error }}</p>
-              {% endfor %}
-            </div>
-            {% endif %}
-          </div>
-
-          <div class="flex flex-col sm:col-span-2">
-            <label class="mb-1 font-medium text-sm text-[var(--ink)]"
-              >{{ contact_form.notes.label }}</label
-            >
-            {{ contact_form.notes }} {% if contact_form.notes.errors %}
-            <div class="text-[var(--danger)] text-sm mt-1">
-              {% for error in contact_form.notes.errors %}
-              <p>{{ error }}</p>
-              {% endfor %}
-            </div>
-            {% endif %}
-          </div>
-        </div>
-      </div>
-
-      <div class="space-y-4 p-5 rounded-3xl bg-[var(--soft)]">
-        <div class="flex items-center gap-2.5">
-          <div class="w-8 h-8 rounded-full bg-[var(--brand-tint)] flex items-center justify-center flex-shrink-0">
-            <span class="material-symbols-outlined text-[var(--brand-text)] text-lg"
-              >notifications</span
-            >
-          </div>
-          <h4 class="font-display text-lg font-semibold text-[var(--ink)]">
-            Configurações do Lembrete
-          </h4>
-        </div>
-
-        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-          <div class="flex flex-col">
-            <label class="mb-1 font-medium text-sm text-[var(--ink)]"
-              >{{ reminder_form.days_before.label }} *</label
-            >
-            {{ reminder_form.days_before }}
-            {% if reminder_form.days_before.errors %}
-            <div class="text-[var(--danger)] text-sm mt-1">
-              {% for error in reminder_form.days_before.errors %}
-              <p>{{ error }}</p>
-              {% endfor %}
-            </div>
-            {% endif %}
-          </div>
-
-          <div class="flex flex-col">
-            <label class="mb-1 font-medium text-sm text-[var(--ink)]"
-              >{{ reminder_form.notify_at.label }} *</label
-            >
-            {{ reminder_form.notify_at }}
-            {% if reminder_form.notify_at.errors %}
-            <div class="text-[var(--danger)] text-sm mt-1">
-              {% for error in reminder_form.notify_at.errors %}
-              <p>{{ error }}</p>
-              {% endfor %}
-            </div>
-            {% endif %}
-          </div>
-
-          <div class="flex items-center justify-between gap-2 sm:col-span-2 px-3 py-2.5 rounded-2xl bg-[var(--surface)] shadow-outline">
-            <label
-              for="id_active"
-              class="text-sm font-medium text-[var(--ink)] cursor-pointer flex items-center gap-2"
-            >
-              <span class="material-symbols-outlined text-[var(--brand-text)] text-lg">notifications_active</span>
-              {{ reminder_form.active.label }}
-            </label>
-            {{ reminder_form.active }}
-            {% if reminder_form.active.errors %}
-            <div class="text-[var(--danger)] text-sm mt-1">
-              {% for error in reminder_form.active.errors %}
-              <p>{{ error }}</p>
-              {% endfor %}
-            </div>
-            {% endif %}
-          </div>
-        </div>
-      </div>
-
-      <div class="flex justify-end max-md:justify-center gap-3 pt-4 border-t border-[var(--line)]">
-        <button
-          type="button"
-          id="cancelCreate"
-          class="px-6 py-2.5 rounded-full bg-[var(--soft)] text-[var(--ink)] font-medium hover:brightness-95 transition-colors"
-        >
-          Cancelar
-        </button>
-        <button
-          type="submit"
-          id="saveReminderBtn"
-          class="px-6 py-2.5 rounded-full bg-brand hover:bg-brand-hover text-white font-medium shadow-primary transition duration-200 hover:-translate-y-0.5 active:translate-y-0 flex items-center gap-2 disabled:opacity-70 disabled:cursor-not-allowed disabled:hover:translate-y-0 motion-reduce:transition-none motion-reduce:hover:translate-y-0"
-        >
-          <span
-            class="material-symbols-outlined text-sm animate-spin hidden"
-            id="saveSpinner"
-            >progress_activity</span
-          >
-          <span id="saveText">Salvar</span>
-        </button>
-      </div>
-    </form>
-  </div>
-</dialog>
-
-<dialog
-  id="deleteDialog"
-  aria-labelledby="deleteDialogTitle"
-  class="rounded-[28px] max-w-md w-5/6 p-0 bg-transparent backdrop:bg-[#262163]/50 backdrop:backdrop-blur-sm m-auto"
->
-  <div class="bg-[var(--surface)] text-[var(--ink)] rounded-[28px] shadow-modal p-6 space-y-5">
-    <div class="space-y-2">
-      <h3 id="deleteDialogTitle" class="font-display text-2xl font-semibold tracking-tight">
-        Excluir lembrete de <span id="deleteName"></span>?
-      </h3>
-      <p class="text-[var(--muted)]">Essa ação não pode ser desfeita.</p>
-    </div>
-    <div class="flex justify-end gap-3">
-      <button
-        type="button"
-        id="cancelDelete"
-        class="px-6 py-2.5 rounded-full bg-[var(--soft)] text-[var(--ink)] font-medium hover:brightness-95 transition"
-      >
-        Cancelar
-      </button>
-      <button
-        type="button"
-        id="confirmDelete"
-        class="px-6 py-2.5 rounded-full bg-[var(--danger)] text-white font-medium hover:brightness-110 transition"
-      >
-        Excluir
-      </button>
-    </div>
-  </div>
-</dialog>
-
+{{ calendar_payload|json_script:"calendarData" }}
 <script>
-  const createDialog = document.getElementById("createDialog");
-  const openCreateBtn = document.getElementById("openCreateDialog");
-  const closeCreateBtn = document.getElementById("closeCreateDialog");
-  const cancelCreateBtn = document.getElementById("cancelCreate");
-
-  const createDialogPanel = document.getElementById("createDialogPanel");
-  const prefersReducedMotion = window.matchMedia(
-    "(prefers-reduced-motion: reduce)"
-  ).matches;
-
-  function openCreate() {
-    if (!createDialog) return;
-    createDialog.showModal();
-    requestAnimationFrame(() => {
-      requestAnimationFrame(() => {
-        if (createDialogPanel) {
-          createDialogPanel.classList.remove("opacity-0", "scale-95");
-          createDialogPanel.classList.add("opacity-100", "scale-100");
-        }
-      });
-    });
-  }
-  function closeCreate() {
-    if (!createDialog) return;
-    if (createDialogPanel && !prefersReducedMotion) {
-      createDialogPanel.classList.remove("opacity-100", "scale-100");
-      createDialogPanel.classList.add("opacity-0", "scale-95");
-      setTimeout(() => createDialog.close(), 180);
-    } else {
-      createDialog.close();
-    }
-  }
-
-  function resetFormToCreate() {
-    document.getElementById("dialogTitle").textContent = "Novo Lembrete";
-    document.getElementById("saveText").textContent = "Salvar";
-    document.getElementById("reminderIdField").value = "";
-
-    const fieldsToClear = [
-      "id_name",
-      "id_birthday",
-      "id_relationship",
-      "id_notes",
-      "id_days_before",
-      "id_notify_at",
-    ];
-
-    fieldsToClear.forEach((fieldId) => {
-      const field = document.getElementById(fieldId);
-      if (!field) return;
-      if (field.type === "textarea") {
-        field.value = "";
-      } else {
-        field.value = field.getAttribute("value") || "";
-      }
-    });
-
-    const activeCheckbox = document.getElementById("id_active");
-    if (activeCheckbox) activeCheckbox.checked = true;
-  }
-
-  if (openCreateBtn)
-    openCreateBtn.addEventListener("click", () => {
-      resetFormToCreate();
-      openCreate();
-    });
-  if (closeCreateBtn)
-    closeCreateBtn.addEventListener("click", (e) => {
-      e.preventDefault();
-      closeCreate();
-    });
-  if (cancelCreateBtn)
-    cancelCreateBtn.addEventListener("click", (e) => {
-      e.preventDefault();
-      resetFormToCreate();
-      closeCreate();
-    });
-
-  {% if show_dialog %}
-  setTimeout(() => {
-    openCreate();
-  }, 100);
-  {% endif %}
-
-  const createForm = document.querySelector(
-    "form[action=\"{% url 'dashboard:create_reminder' %}\"]"
-  );
-  const saveReminderBtn = document.getElementById("saveReminderBtn");
-  const saveSpinner = document.getElementById("saveSpinner");
-  const saveText = document.getElementById("saveText");
-  const dialogTitle = document.getElementById("dialogTitle");
-  const reminderIdField = document.getElementById("reminderIdField");
-
-  if (createForm && saveReminderBtn) {
-    createForm.addEventListener("submit", function (e) {
-      saveReminderBtn.disabled = true;
-      saveSpinner.classList.remove("hidden");
-      saveText.textContent = "Salvando...";
-    });
-  }
-
-  document.querySelectorAll("[data-edit-reminder]").forEach((btn) => {
-    btn.addEventListener("click", () => {
-      const dataset = btn.dataset;
-
-      dialogTitle.textContent = "Editar Lembrete";
-      saveText.textContent = "Atualizar";
-      reminderIdField.value = dataset.reminderId || "";
-
-      const map = {
-        id_name: dataset.name,
-        id_birthday: dataset.birthday,
-        id_relationship: dataset.relationship,
-        id_notes: dataset.notes,
-        id_days_before: dataset.daysBefore,
-        id_notify_at: dataset.notifyAt,
-      };
-
-      Object.entries(map).forEach(([id, value]) => {
-        const el = document.getElementById(id);
-        if (el && typeof value !== "undefined") {
-          el.value = value;
-        }
-      });
-
-      const activeCheckbox = document.getElementById("id_active");
-      if (activeCheckbox) {
-        activeCheckbox.checked = (dataset.active || "false").toString().toLowerCase() === "true";
-      }
-
-      openCreate();
-    });
-  });
-
-  const deleteDialog = document.getElementById("deleteDialog");
-  const deleteName = document.getElementById("deleteName");
-  let pendingDeleteForm = null;
-
-  document.querySelectorAll("[data-delete-form]").forEach((form) => {
-    form.addEventListener("submit", (e) => {
-      if (form.dataset.confirmed === "1") return;
-      e.preventDefault();
-      pendingDeleteForm = form;
-      deleteName.textContent = form.dataset.name;
-      deleteDialog.showModal();
-    });
-  });
-
-  document.getElementById("cancelDelete").addEventListener("click", () => {
-    pendingDeleteForm = null;
-    deleteDialog.close();
-  });
-
-  document.getElementById("confirmDelete").addEventListener("click", () => {
-    if (!pendingDeleteForm) return;
-    pendingDeleteForm.dataset.confirmed = "1";
-    pendingDeleteForm.submit();
-  });
-
-  const profileDropdownBtn = document.getElementById("profileDropdownBtn");
-  const profileDropdown = document.getElementById("profileDropdown");
-
-  if (profileDropdownBtn && profileDropdown) {
-    profileDropdownBtn.addEventListener("click", (e) => {
-      e.stopPropagation();
-      profileDropdown.classList.toggle("hidden");
-    });
-
-    document.addEventListener("click", (e) => {
-      if (
-        !profileDropdownBtn.contains(e.target) &&
-        !profileDropdown.contains(e.target)
-      ) {
-        profileDropdown.classList.add("hidden");
-      }
-    });
-  }
-
   (function () {
-    const statusToasts = {
-      email_verified: ["E-mail confirmado com sucesso! Bem-vindo(a).", "success"],
-      reminder_created: ["Lembrete criado com sucesso!", "success"],
-      reminder_updated: ["Lembrete atualizado com sucesso!", "success"],
-      reminder_deleted: ["Lembrete excluído com sucesso!", "success"],
-    };
+    var data = JSON.parse(document.getElementById('calendarData').textContent);
+    var months = data.months;
+    var today = data.today;
+    var MONTH_NAMES = ['janeiro', 'fevereiro', 'março', 'abril', 'maio', 'junho', 'julho', 'agosto', 'setembro', 'outubro', 'novembro', 'dezembro'];
+    var HINT = 'Escolha um dia marcado para ver quem faz aniversário.';
+    var grid = document.getElementById('calGrid');
+    var label = document.getElementById('calLabel');
+    var detail = document.getElementById('calDetail');
+    var prev = document.getElementById('calPrev');
+    var next = document.getElementById('calNext');
+    var index = 0;
+    var selected = null;
 
-    const params = new URLSearchParams(window.location.search);
-    const found = Object.keys(statusToasts).find(
-      (key) => params.get(key) === "1"
-    );
-    if (!found) return;
+    function joinNames(list) {
+      var names = list.map(function (p) { return p.name; });
+      if (names.length <= 1) return names.join('');
+      return names.slice(0, -1).join(', ') + ' e ' + names[names.length - 1];
+    }
 
-    const [message, type] = statusToasts[found];
-    showAppToast(message, type);
+    function showDetail(m, day) {
+      var people = m.days[day];
+      detail.textContent = '';
+      var title = document.createElement('p');
+      title.className = 'font-medium text-[var(--ink)] mb-2';
+      title.textContent = day + ' de ' + MONTH_NAMES[m.month - 1];
+      detail.appendChild(title);
+      people.forEach(function (p) {
+        var tone = data.tones[p.tone];
+        var row = document.createElement('div');
+        row.className = 'flex items-center gap-3 py-1.5';
+        var av = document.createElement('span');
+        av.className = 'w-8 h-8 rounded-full flex items-center justify-center font-semibold text-sm flex-shrink-0';
+        av.style.background = tone.bg;
+        av.style.color = tone.fg;
+        av.textContent = p.name.charAt(0).toUpperCase();
+        var text = document.createElement('span');
+        text.className = 'text-[var(--ink)]';
+        text.textContent = p.name + ' faz ' + p.age + (p.age === 1 ? ' ano' : ' anos') + (p.relationship ? ' · ' + p.relationship : '') + (p.active ? '' : ' (pausado)');
+        row.appendChild(av);
+        row.appendChild(text);
+        detail.appendChild(row);
+      });
+    }
 
-    params.delete(found);
-    const newSearch = params.toString();
-    const newUrl =
-      window.location.pathname + (newSearch ? "?" + newSearch : "");
-    window.history.replaceState({}, "", newUrl);
+    function render() {
+      var m = months[index];
+      label.textContent = m.label;
+      prev.disabled = index === 0;
+      next.disabled = index === months.length - 1;
+      grid.textContent = '';
+
+      for (var i = 0; i < m.lead; i++) {
+        grid.appendChild(document.createElement('span'));
+      }
+
+      for (var d = 1; d <= m.total; d++) {
+        var people = m.days[d];
+        var isToday = today[0] === m.year && today[1] === m.month && today[2] === d;
+        var cell;
+        if (people) {
+          cell = document.createElement('button');
+          cell.type = 'button';
+          cell.className = 'al-day has-birthday' + (isToday ? ' is-today' : '');
+          cell.setAttribute('aria-label', d + ' de ' + MONTH_NAMES[m.month - 1] + ', aniversário de ' + joinNames(people));
+          var isSel = selected && selected.index === index && selected.day === d;
+          cell.setAttribute('aria-pressed', isSel ? 'true' : 'false');
+          if (isSel) cell.classList.add('is-selected');
+          var num = document.createElement('span');
+          num.textContent = d;
+          var dots = document.createElement('span');
+          dots.className = 'flex gap-0.5';
+          people.slice(0, 3).forEach(function (p) {
+            var dot = document.createElement('span');
+            dot.className = 'al-dot';
+            dot.style.background = data.tones[p.tone].dot;
+            dots.appendChild(dot);
+          });
+          cell.appendChild(num);
+          cell.appendChild(dots);
+          (function (day) {
+            cell.addEventListener('click', function () {
+              selected = { index: index, day: day };
+              render();
+              showDetail(months[index], day);
+              var again = grid.querySelector('[aria-pressed="true"]');
+              if (again) again.focus();
+            });
+          })(d);
+        } else {
+          cell = document.createElement('span');
+          cell.className = 'al-day' + (isToday ? ' is-today' : '');
+          cell.textContent = d;
+          if (isToday) cell.setAttribute('aria-label', 'Hoje, ' + d + ' de ' + MONTH_NAMES[m.month - 1]);
+        }
+        grid.appendChild(cell);
+      }
+    }
+
+    function go(step) {
+      var target = index + step;
+      if (target < 0 || target >= months.length) return;
+      index = target;
+      selected = null;
+      detail.textContent = HINT;
+      render();
+    }
+
+    prev.addEventListener('click', function () { go(-1); });
+    next.addEventListener('click', function () { go(1); });
+
+    render();
   })();
 </script>
 
-{% endblock %}
+{% endblock content %}

@@ -12,7 +12,7 @@ base_templates/
   partials/_head.html       ← <head> compartilhado (fonts, Tailwind, favicon, Toastify, showAppToast, config do tema)
 
 base_static/
-  css/style.css              ← .inter (font-family) + @keyframes/glow que o Tailwind CDN não expressa em classe
+  css/style.css              ← tokens, componentes (.al-*) e @keyframes que o Tailwind CDN não expressa em classe
   images/
     logo.svg                 ← logo oficial (ícone calendário+pontos), usada na UI
     logo-email.png           ← versão PNG gerada a partir da logo, só para e-mail
@@ -71,8 +71,8 @@ Carrega, nessa ordem: script anti-flash de tema (aplica `dark` no
 `<html>` antes da primeira pintura, lendo `localStorage`/preferência do
 sistema), favicon, Tailwind CDN + `tailwind.config = { darkMode: 'class'
 }` (sem isso o CDN só seguiria a preferência do sistema, não daria pra
-ter um botão manual), fonte de ícones Material Symbols, preconnect para
-Google Fonts, fonte Inter, `style.css` próprio, CSS+JS do Toastify e o
+ter um botão manual), Lucide (ícones), preconnect para
+Google Fonts, fontes Geist e Bricolage Grotesque, `style.css` próprio, CSS+JS do Toastify e o
 helper global `showAppToast(message, type)` (ver
 [`front/styling.md`](styling.md#toasts)).
 

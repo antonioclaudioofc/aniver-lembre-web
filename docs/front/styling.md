@@ -1,34 +1,40 @@
 # Estilo visual
 
-## Tailwind via CDN
+## Tailwind via CDN e tokens
 
 ```html
 <script src="https://cdn.tailwindcss.com"></script>
+<script src="{% static 'js/tailwind.config.js' %}"></script>
 ```
 
-Sem `tailwind.config.js`, sem processo de build, sem purge de classes não
-usadas — o script do CDN escaneia o DOM renderizado e injeta o CSS
-necessário em runtime. Suficiente para o tamanho atual do projeto, mas
-vale saber as limitações se o projeto crescer: não dá para customizar o
-tema (cores, fontes) do jeito Tailwind normalmente permite, e o CDN não é
-recomendado pela própria documentação do Tailwind para produção (tempo de
-carregamento, sem cache de build).
+Sem processo de build: o CDN gera o CSS em runtime a partir das classes do
+DOM. Os tokens do redesign (cores, fontes, raios, sombras) ficam em
+`base_static/js/tailwind.config.js` (`night`, `brand`, `ink`, `muted`,
+`soft`, `contact-*`...) e como variáveis CSS em `base_static/css/style.css`
+(`--bg`, `--surface`, `--ink`, `--muted`, `--brand`...). As variáveis mudam
+sozinhas no modo escuro (classe `dark` no `<html>`), por isso as telas usam
+`bg-[var(--surface)]`, `text-[var(--ink)]` etc. em vez de pares `dark:`.
 
 ## Cor de marca
 
-`indigo-600` (`#4f46e5`) é a cor de destaque em toda a aplicação: botões
-primários, ícones ativos, badges de status, e é a mesma cor usada nos
-e-mails (fundo do badge da logo, cabeçalho do card, botão de CTA) — para
-manter a identidade visual consistente entre o site e os e-mails
-transacionais.
+`brand` (`#5B5BD6`) é a cor de ação; `night` (`#262163`) destaca o próximo
+aniversário e os cabeçalhos de modal, sempre com a textura `.al-dots`. O
+logo (`#6875F5`) só aparece no símbolo. Os e-mails continuam em
+`indigo-600`.
 
-## Tipografia
+## Tipografia e ícones
 
-- **Inter** (Google Fonts) — fonte de corpo, aplicada via classe `.inter`
-  no `<body>` (`base_static/css/style.css`).
-- **Material Symbols Outlined** (Google Fonts) — todos os ícones do site
-  (não são SVGs individuais, é uma fonte de ícones: `<span
-  class="material-symbols-outlined">nome_do_icone</span>`).
+- **Geist** — interface e corpo (`font-sans`).
+- **Bricolage Grotesque** — títulos, datas e wordmark (`font-display`).
+- **Lucide** — ícones, via `<i data-lucide="nome" class="w-5 h-5"></i>`;
+  `lucide.createIcons()` roda em `base_static/js/app.js`.
+
+## Componentes compartilhados
+
+Includes em `base_templates/components/`: `_date_stamp.html` (carimbo de
+data), `_avatar.html` (tom por `id % 8`), `_empty_state.html` e
+`_pagination.html`. A barra do topo e a barra móvel ficam em
+`base_templates/partials/_topbar.html`.
 
 ## Tema escuro (dark mode)
 
@@ -131,16 +137,7 @@ externo de forma confiável. Por isso esses templates usam:
 
 ## `style.css`
 
-Hoje só contém a declaração da fonte Inter:
-
-```css
-.inter {
-  font-family: "Inter", sans-serif;
-  font-optical-sizing: auto;
-  font-weight: 400;
-  font-style: normal;
-}
-```
-
-Tudo o resto do visual do site vem de classes utilitárias do Tailwind
-direto no HTML.
+Contém os tokens como variáveis CSS, o carimbo de data (`.al-stamp`), o
+calendário (`.al-day`), o seletor segmentado (`.al-segment`), o interruptor
+(`.al-switch`), o toast (`.al-toast`) e as animações. O restante vem de
+classes do Tailwind no HTML.

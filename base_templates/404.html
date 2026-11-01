@@ -27,7 +27,7 @@
       href="{% if user.is_authenticated %}{% url 'dashboard:index' %}{% else %}{% url 'accounts:login' %}{% endif %}"
       class="inline-flex items-center gap-2 px-6 py-3 rounded-full bg-brand hover:bg-brand-hover text-white font-medium shadow-primary transition duration-200 hover:-translate-y-0.5 motion-reduce:transition-none motion-reduce:hover:translate-y-0 opacity-0 animate-[fadeUp_0.6s_cubic-bezier(0.16,1,0.3,1)_0.3s_forwards] motion-reduce:animate-none motion-reduce:opacity-100"
     >
-      <span class="material-symbols-outlined text-lg">arrow_back</span>
+      <i data-lucide="arrow-left" class="w-[18px] h-[18px]"></i>
       {% if user.is_authenticated %}Voltar para o início{% else %}Voltar para o login{% endif %}
     </a>
   </div>

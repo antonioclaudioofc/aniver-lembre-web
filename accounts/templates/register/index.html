@@ -1,92 +1,17 @@
 {% extends "global/base.html" %} {% load static %} {% block content %}
 
-<section class="min-h-screen lg:h-screen lg:overflow-hidden grid grid-cols-2 max-lg:grid-cols-1">
-  <div
-    class="ambient-panel bg-night al-dots flex justify-center items-center flex-col gap-4 max-lg:hidden lg:h-full"
-  >
-    <div
-      class="relative w-full max-w-md h-[34rem] max-h-[70vh] cursor-grab active:cursor-grabbing touch-pan-y select-none opacity-0 animate-[fadeUp_0.6s_cubic-bezier(0.16,1,0.3,1)_0.05s_forwards] motion-reduce:animate-none motion-reduce:opacity-100"
-      id="authCarousel"
-    >
-      <div
-        class="carousel-slide absolute inset-0 flex flex-col items-center justify-center gap-4 opacity-100 visible transition-opacity duration-[400ms] motion-reduce:transition-none"
-        data-slide
-      >
-        <img
-          src="{% static 'images/moments.svg' %}"
-          class="max-w-72 w-full max-h-72"
-          alt="Momentos"
-          draggable="false"
-        />
-        <div class="max-w-96 text-center">
-          <h2 class="text-4xl font-bold mb-2 text-white">
-            Nunca esqueça um aniversário!
-          </h2>
-          <p class="text-gray-200">
-            Receba lembretes e celebre seus amigos e familiares com
-            pontualidade.
-          </p>
-        </div>
-      </div>
-
-      <div
-        class="carousel-slide absolute inset-0 flex flex-col items-center justify-center gap-4 opacity-0 invisible transition-opacity duration-[400ms] motion-reduce:transition-none"
-        data-slide
-      >
-        <img
-          src="{% static 'images/organize-photos.svg' %}"
-          class="max-w-72 w-full max-h-72"
-          alt="Organize contatos"
-          draggable="false"
-        />
-        <div class="max-w-96 text-center">
-          <h2 class="text-4xl font-bold mb-2 text-white">
-            Organize seus contatos
-          </h2>
-          <p class="text-gray-200">
-            Cadastre aniversários, relação e observações de cada pessoa num só
-            lugar.
-          </p>
-        </div>
-      </div>
-
-      <div
-        class="carousel-slide absolute inset-0 flex flex-col items-center justify-center gap-4 opacity-0 invisible transition-opacity duration-[400ms] motion-reduce:transition-none"
-        data-slide
-      >
-        <div
-          class="w-36 h-36 rounded-full bg-white/15 flex items-center justify-center"
-        >
-          <span class="material-symbols-outlined text-white text-7xl"
-            >mark_email_read</span
-          >
-        </div>
-        <div class="max-w-96 text-center">
-          <h2 class="text-4xl font-bold mb-2 text-white">
-            Lembretes no seu horário
-          </h2>
-          <p class="text-gray-200">
-            Escolha quantos dias antes e a que horas quer ser avisado por
-            e-mail.
-          </p>
-        </div>
-      </div>
-
-      <div class="absolute inset-x-0 -bottom-2 flex justify-center gap-2">
-        <button type="button" data-dot class="carousel-dot w-6 h-2 rounded-full bg-white transition-all duration-300" aria-label="Slide 1"></button>
-        <button type="button" data-dot class="carousel-dot w-2 h-2 rounded-full bg-white/40 transition-all duration-300" aria-label="Slide 2"></button>
-        <button type="button" data-dot class="carousel-dot w-2 h-2 rounded-full bg-white/40 transition-all duration-300" aria-label="Slide 3"></button>
-      </div>
-    </div>
-  </div>
-  <div class="w-full lg:h-full lg:overflow-y-auto bg-[var(--bg)] text-[var(--ink)]">
-   <div class="min-h-full flex flex-col w-full items-center justify-center px-8 py-12">
+<section class="min-h-screen bg-[var(--bg)]">
+  <div class="w-full text-[var(--ink)]">
+   <div class="min-h-screen flex flex-col w-full items-center justify-center px-6 py-12">
     <div class="w-full m-auto max-w-sm">
-      <img
-        src="{% static 'images/logo.svg' %}"
-        alt="AniverLembre Logo"
-        class="w-[8rem] max-h-[32rem] mx-auto opacity-0 animate-[fadeUp_0.6s_cubic-bezier(0.16,1,0.3,1)_0.05s_forwards] motion-reduce:animate-none motion-reduce:opacity-100"
-      />
+      <div class="relative mx-auto w-[76px] h-[76px] opacity-0 animate-[fadeUp_0.6s_cubic-bezier(0.16,1,0.3,1)_0.05s_forwards] motion-reduce:animate-none motion-reduce:opacity-100">
+      <span class="w-[76px] h-[76px] rounded-[22px] bg-white shadow-outline flex items-center justify-center">
+        <img src="{% static 'images/logo.svg' %}" alt="" class="w-11 h-11" />
+      </span>
+      <span class="al-confetti" style="width: 10px; height: 10px; top: -4px; right: -10px; background: var(--coral)"></span>
+      <span class="al-confetti" style="width: 7px; height: 7px; top: 22px; right: -18px; background: var(--honey)"></span>
+      <span class="al-confetti" style="width: 8px; height: 8px; bottom: -2px; left: -12px; background: var(--mint)"></span>
+    </div>
       <h2 class="font-display text-3xl lg:text-4xl font-bold tracking-tight text-center mt-4 mb-1 opacity-0 animate-[fadeUp_0.6s_cubic-bezier(0.16,1,0.3,1)_0.14s_forwards] motion-reduce:animate-none motion-reduce:opacity-100">
         Crie sua conta
       </h2>
@@ -118,7 +43,7 @@
               tabindex="-1"
               class="absolute right-3 top-1/2 -translate-y-1/2 text-[var(--muted)] hover:text-[var(--ink)] transition-colors"
             >
-              <span class="material-symbols-outlined text-xl" id="togglePasswordIcon">visibility</span>
+              <span id="togglePasswordIcon"><i data-lucide="eye" class="w-5 h-5"></i><i data-lucide="eye-off" class="w-5 h-5 hidden"></i></span>
             </button>
             {% elif field.name == 'confirm_password' %}
             <button
@@ -127,7 +52,7 @@
               tabindex="-1"
               class="absolute right-3 top-1/2 -translate-y-1/2 text-[var(--muted)] hover:text-[var(--ink)] transition-colors"
             >
-              <span class="material-symbols-outlined text-xl" id="toggleConfirmPasswordIcon">visibility</span>
+              <span id="toggleConfirmPasswordIcon"><i data-lucide="eye" class="w-5 h-5"></i><i data-lucide="eye-off" class="w-5 h-5 hidden"></i></span>
             </button>
             {% endif %}
           </div>
@@ -143,11 +68,7 @@
           id="registerBtn"
           class="w-full bg-brand hover:bg-brand-hover text-white py-3 rounded-full font-medium shadow-primary transition duration-200 hover:-translate-y-0.5 active:translate-y-0 disabled:opacity-70 disabled:cursor-not-allowed disabled:hover:translate-y-0 flex items-center justify-center gap-2 motion-reduce:transition-none motion-reduce:hover:translate-y-0"
         >
-          <span
-            class="material-symbols-outlined animate-spin hidden"
-            id="registerSpinner"
-            >progress_activity</span
-          >
+          <span id="registerSpinner" class="hidden"><i data-lucide="loader-circle" class="w-6 h-6 animate-spin"></i></span>
           <span id="registerText">Criar</span>
         </button>
       </form>
@@ -189,7 +110,7 @@
     button.addEventListener("click", () => {
       const showing = input.type === "text";
       input.type = showing ? "password" : "text";
-      icon.textContent = showing ? "visibility" : "visibility_off";
+      window.toggleEye(icon, showing);
     });
   }
 
@@ -200,104 +121,7 @@
     "toggleConfirmPasswordIcon"
   );
 
-  function initCarousel(root) {
-    if (!root) return;
-
-    const slides = root.querySelectorAll('[data-slide]');
-    const dots = root.querySelectorAll('[data-dot]');
-    const prefersReducedMotion = window.matchMedia(
-      '(prefers-reduced-motion: reduce)'
-    ).matches;
-    let index = 0;
-    let timer = null;
-
-    const widthClassOf = (el) => [...el.classList].find((c) => /^w-/.test(c));
-    const activeWidthClass = dots.length ? widthClassOf(dots[0]) : null;
-    const inactiveWidthClass = dots.length > 1 ? widthClassOf(dots[1]) : null;
-
-    function show(i) {
-      index = i;
-      slides.forEach((slide, n) => {
-        const active = n === i;
-        slide.classList.toggle('opacity-100', active);
-        slide.classList.toggle('visible', active);
-        slide.classList.toggle('opacity-0', !active);
-        slide.classList.toggle('invisible', !active);
-      });
-      dots.forEach((dot, n) => {
-        const active = n === i;
-        dot.classList.toggle('bg-white', active);
-        dot.classList.toggle('bg-white/40', !active);
-        if (activeWidthClass && inactiveWidthClass) {
-          dot.classList.remove(activeWidthClass, inactiveWidthClass);
-          dot.classList.add(active ? activeWidthClass : inactiveWidthClass);
-        }
-      });
-    }
-
-    function start() {
-      if (prefersReducedMotion || slides.length < 2) return;
-      stop();
-      timer = setInterval(() => show((index + 1) % slides.length), 2000);
-    }
-
-    function stop() {
-      if (timer) clearInterval(timer);
-    }
-
-    dots.forEach((dot, n) => {
-      dot.addEventListener('click', () => {
-        show(n);
-        start();
-      });
-    });
-
-    root.addEventListener('mouseenter', stop);
-    root.addEventListener('mouseleave', start);
-
-    if (slides.length > 1) {
-      let dragging = false;
-      let startX = 0;
-      let deltaX = 0;
-      const threshold = 40;
-
-      root.addEventListener('pointerdown', (e) => {
-        dragging = true;
-        startX = e.clientX;
-        deltaX = 0;
-        stop();
-        root.setPointerCapture(e.pointerId);
-        slides[index].style.transition = 'none';
-      });
-
-      root.addEventListener('pointermove', (e) => {
-        if (!dragging) return;
-        deltaX = e.clientX - startX;
-        slides[index].style.transform = `translateX(${deltaX}px)`;
-      });
-
-      function endDrag() {
-        if (!dragging) return;
-        dragging = false;
-        slides[index].style.transition = '';
-        slides[index].style.transform = '';
-
-        if (deltaX <= -threshold) {
-          show((index + 1) % slides.length);
-        } else if (deltaX >= threshold) {
-          show((index - 1 + slides.length) % slides.length);
-        }
-        start();
-      }
-
-      root.addEventListener('pointerup', endDrag);
-      root.addEventListener('pointercancel', endDrag);
-    }
-
-    start();
-  }
-
-  initCarousel(document.getElementById('authCarousel'));
+  
 
   {% if form.non_field_errors %}
   showAppToast("{{ form.non_field_errors|striptags|escapejs }}", "danger");

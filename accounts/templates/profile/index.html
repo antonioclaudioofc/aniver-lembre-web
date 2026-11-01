@@ -1,83 +1,16 @@
-{% extends "global/base.html" %} {% load static dashboard_extras %} {% block content %}
+{% extends "global/base.html" %}
+{% load static dashboard_extras %}
+{% block floating_theme %}{% endblock floating_theme %}
+{% block content %}
 
-<nav class="w-full border-b border-[var(--line)] bg-[var(--surface)] sticky top-0 z-40">
-  <div class="max-w-7xl mx-auto p-4 flex items-center justify-between">
-    <div
-      class="flex items-center gap-3 cursor-pointer transition-opacity hover:opacity-80 text-[var(--ink)]"
-      onclick="location.href='{% url 'dashboard:index' %}'"
-    >
-      <img src="{% static 'images/logo.svg' %}" alt="Logo" class="w-8 h-8" />
-      <span class="font-display font-bold text-xl tracking-tight max-md:hidden">aniver<span class="text-[var(--brand-text)]">lembre</span></span>
-    </div>
-    <div class="flex items-center gap-2">
-      <div class="relative">
-        <button
-          id="profileDropdownBtn"
-          class="flex items-center gap-2 px-3 py-2 rounded-full bg-[var(--surface)] hover:bg-[var(--soft)] outline-none transition-colors"
-        >
-          <div
-            class="w-8 h-8 rounded-full bg-brand text-white font-semibold flex items-center justify-center flex-shrink-0"
-          >
-            {{ user.first_name|default:user.username|slice:":1"|upper }}
-          </div>
-          <span class="text-sm font-medium text-[var(--ink)]"
-            >{{ user.first_name|default:user.username }}</span
-          >
-          <span
-            class="material-symbols-outlined text-[var(--muted)] text-base flex-shrink-0"
-          >
-            expand_more
-          </span>
-        </button>
+{% include "partials/_topbar.html" with active="profile" %}
 
-        <div
-          id="profileDropdown"
-          class="hidden absolute right-0 mt-2 w-48 bg-[var(--surface)] rounded-2xl shadow-modal py-1 border border-[var(--line)] z-50"
-        >
-          <a
-            href="{% url 'accounts:profile' %}"
-            class="block px-4 py-2 text-sm text-[var(--ink)] font-medium hover:bg-[var(--soft)]"
-          >
-            <span
-              class="material-symbols-outlined text-[var(--muted)] text-sm align-middle mr-2"
-              >person</span
-            >
-            Perfil
-          </a>
-          {% if user.is_superuser %}
-          <a
-            href="{% url 'panel:overview' %}"
-            class="block px-4 py-2 text-sm text-[var(--brand-text)] font-medium hover:bg-[var(--soft)]"
-          >
-            <span
-              class="material-symbols-outlined text-[var(--brand-text)] text-sm align-middle mr-2"
-              >admin_panel_settings</span
-            >
-            Painel Admin
-          </a>
-          {% endif %}
-          <a
-            href="{% url 'accounts:logout' %}"
-            class="block px-4 py-2 text-sm text-[var(--danger)] font-medium hover:bg-[var(--soft)]"
-          >
-            <span
-              class="material-symbols-outlined text-[var(--danger)] text-sm align-middle mr-2"
-              >logout</span
-            >
-            Sair
-          </a>
-        </div>
-      </div>
-    </div>
-  </div>
-</nav>
-
-<main class="max-w-3xl mx-auto px-4 py-8">
+<main class="max-w-3xl mx-auto px-4 pt-8 pb-32 sm:pb-8">
   <a
     href="{% url 'dashboard:index' %}"
     class="inline-flex items-center gap-2 px-4 py-2 rounded-full text-[var(--brand-text)] transition-colors border border-brand font-medium hover:bg-brand hover:text-white mb-6 opacity-0 animate-[fadeUp_0.5s_cubic-bezier(0.16,1,0.3,1)_0.05s_forwards] motion-reduce:animate-none motion-reduce:opacity-100"
   >
-    <span class="material-symbols-outlined text-lg">arrow_back</span>
+    <i data-lucide="arrow-left" class="w-[18px] h-[18px]"></i>
     Voltar
   </a>
 
@@ -132,7 +65,7 @@
         </div>
 
         <div class="flex items-center gap-2 px-3 py-2.5 rounded-lg bg-amber-50 dark:bg-amber-950/40 border border-amber-100 dark:border-amber-900">
-          <span class="material-symbols-outlined text-amber-500 dark:text-amber-400 text-lg flex-shrink-0">warning</span>
+          <i data-lucide="triangle-alert" class="w-[18px] h-[18px] text-amber-500 dark:text-amber-400 flex-shrink-0"></i>
           <p class="text-xs text-amber-700 dark:text-amber-400">
             Se você trocar o e-mail, vamos pedir a confirmação de um código novo antes de valer pros seus lembretes.
           </p>
@@ -144,7 +77,7 @@
             id="saveProfileBtn"
             class="px-6 py-2.5 rounded-full bg-brand hover:bg-brand-hover text-white font-medium shadow-primary transition duration-200 hover:-translate-y-0.5 active:translate-y-0 flex items-center gap-2 disabled:opacity-70 disabled:cursor-not-allowed disabled:hover:translate-y-0 motion-reduce:transition-none motion-reduce:hover:translate-y-0"
           >
-            <span class="material-symbols-outlined text-sm animate-spin hidden" id="saveProfileSpinner">progress_activity</span>
+            <span id="saveProfileSpinner" class="hidden"><i data-lucide="loader-circle" class="w-4 h-4 animate-spin"></i></span>
             <span id="saveProfileText">Salvar alterações</span>
           </button>
         </div>
@@ -153,7 +86,7 @@
       <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
         <div class="flex items-start gap-3 p-4 rounded-2xl bg-[var(--soft)]">
           <div class="w-9 h-9 rounded-full bg-[var(--brand-tint)] flex items-center justify-center flex-shrink-0">
-            <span class="material-symbols-outlined text-[var(--brand-text)] text-lg">alternate_email</span>
+            <i data-lucide="at-sign" class="w-[18px] h-[18px] text-[var(--brand-text)]"></i>
           </div>
           <div class="min-w-0">
             <p class="text-xs font-semibold text-[var(--muted)] uppercase tracking-wide">Usuário</p>
@@ -163,7 +96,7 @@
 
         <div class="flex items-start gap-3 p-4 rounded-2xl bg-[var(--soft)]">
           <div class="w-9 h-9 rounded-full bg-[var(--brand-tint)] flex items-center justify-center flex-shrink-0">
-            <span class="material-symbols-outlined text-[var(--brand-text)] text-lg">calendar_month</span>
+            <i data-lucide="calendar" class="w-[18px] h-[18px] text-[var(--brand-text)]"></i>
           </div>
           <div class="min-w-0">
             <p class="text-xs font-semibold text-[var(--muted)] uppercase tracking-wide">Conta criada em</p>
@@ -176,25 +109,6 @@
 </main>
 
 <script>
-  const profileDropdownBtn = document.getElementById("profileDropdownBtn");
-  const profileDropdown = document.getElementById("profileDropdown");
-
-  if (profileDropdownBtn && profileDropdown) {
-    profileDropdownBtn.addEventListener("click", (e) => {
-      e.stopPropagation();
-      profileDropdown.classList.toggle("hidden");
-    });
-
-    document.addEventListener("click", (e) => {
-      if (
-        !profileDropdownBtn.contains(e.target) &&
-        !profileDropdown.contains(e.target)
-      ) {
-        profileDropdown.classList.add("hidden");
-      }
-    });
-  }
-
   const saveProfileForm = document.querySelector("form");
   const saveProfileBtn = document.getElementById("saveProfileBtn");
   const saveProfileSpinner = document.getElementById("saveProfileSpinner");
