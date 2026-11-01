@@ -1,8 +1,64 @@
-.inter {
-  font-family: "Inter", sans-serif;
-  font-optical-sizing: auto;
-  font-weight: 400;
-  font-style: normal;
+:root {
+  --night: #262163;
+  --brand: #5b5bd6;
+  --brand-text: #4b4bc8;
+  --brand-tint: #e4e3fb;
+  --logo: #6875f5;
+  --bg: #f6f5fb;
+  --surface: #ffffff;
+  --field: #fafafd;
+  --soft: #f1f0f8;
+  --line: #eceaf5;
+  --line-field: #e2e0ee;
+  --ink: #1c1b2e;
+  --muted: #67667a;
+  --on-night: #c9c6f2;
+  --danger: #b4233f;
+  --coral: #ff7a59;
+  --honey: #ffc857;
+  --mint: #3ccfae;
+  --lavender: #a9a6ff;
+
+  --radius-field: 14px;
+  --radius-block: 28px;
+  --shadow-primary: 0 8px 20px -10px rgba(91, 91, 214, 0.9);
+  --shadow-modal: 0 40px 90px -30px rgba(38, 33, 99, 0.45);
+  --focus-ring: 0 0 0 4px rgba(91, 91, 214, 0.14);
+}
+
+.dark {
+  --bg: #111113;
+  --surface: #1a1a24;
+  --field: #15151d;
+  --soft: #23232f;
+  --line: #2a2a38;
+  --line-field: #33334a;
+  --ink: #ececf1;
+  --muted: #a1a1b3;
+  --brand-text: #a9a6ff;
+  --brand-tint: #2e2e52;
+}
+
+body {
+  font-family: Geist, system-ui, sans-serif;
+}
+
+.font-display {
+  font-variation-settings: 'opsz' 48;
+}
+
+.al-dots {
+  background-image: radial-gradient(
+    rgba(255, 255, 255, 0.16) 2px,
+    transparent 2.5px
+  );
+  background-size: 26px 26px;
+}
+
+.al-focus:focus-visible {
+  outline: none;
+  border-color: var(--brand);
+  box-shadow: var(--focus-ring);
 }
 
 @keyframes fadeUp {
@@ -43,7 +99,7 @@
 
 .ambient-panel::before,
 .ambient-panel::after {
-  content: "";
+  content: '';
   position: absolute;
   border-radius: 9999px;
   background: radial-gradient(

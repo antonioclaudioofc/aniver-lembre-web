@@ -14,20 +14,20 @@ class ContactForm(forms.ModelForm):
         }
         widgets = {
             'name': forms.TextInput(attrs={
-                'class': 'bg-white dark:bg-gray-800 w-full text-black dark:text-white rounded-md border border-gray-200 dark:border-gray-700 px-4 py-3 text-sm transition-colors placeholder:text-gray-500 dark:placeholder:text-gray-500 outline-none focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500',
+                'class': 'bg-[var(--field)] w-full text-[var(--ink)] rounded-field border border-[var(--line-field)] px-4 py-3 text-base sm:text-[15px] transition-colors placeholder:text-[var(--muted)] outline-none focus:border-brand focus:shadow-focus',
                 'placeholder': 'Digite o nome do contato'
             }),
             'birthday': forms.DateInput(attrs={
                 'type': 'date',
-                'class': 'bg-white dark:bg-gray-800 w-full text-black dark:text-white rounded-md border border-gray-200 dark:border-gray-700 px-4 py-3 text-sm transition-colors placeholder:text-gray-500 dark:placeholder:text-gray-500 outline-none focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500'
+                'class': 'bg-[var(--field)] w-full text-[var(--ink)] rounded-field border border-[var(--line-field)] px-4 py-3 text-base sm:text-[15px] transition-colors placeholder:text-[var(--muted)] outline-none focus:border-brand focus:shadow-focus'
             }),
             'relationship': forms.TextInput(attrs={
-                'class': 'bg-white dark:bg-gray-800 w-full text-black dark:text-white rounded-md border border-gray-200 dark:border-gray-700 px-4 py-3 text-sm transition-colors placeholder:text-gray-500 dark:placeholder:text-gray-500 outline-none focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500',
+                'class': 'bg-[var(--field)] w-full text-[var(--ink)] rounded-field border border-[var(--line-field)] px-4 py-3 text-base sm:text-[15px] transition-colors placeholder:text-[var(--muted)] outline-none focus:border-brand focus:shadow-focus',
                 'placeholder': 'Ex: Amigo, Família, Colega...'
             }),
             'notes': forms.Textarea(attrs={
                 'rows': 3,
-                'class': 'bg-white dark:bg-gray-800 w-full text-black dark:text-white rounded-md border border-gray-200 dark:border-gray-700 px-4 py-3 text-sm transition-colors placeholder:text-gray-500 dark:placeholder:text-gray-500 outline-none focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500 resize-none',
+                'class': 'bg-[var(--field)] w-full text-[var(--ink)] rounded-field border border-[var(--line-field)] px-4 py-3 text-base sm:text-[15px] transition-colors placeholder:text-[var(--muted)] outline-none focus:border-brand focus:shadow-focus resize-none',
                 'placeholder': 'Adicione informações extras sobre o contato...'
             }),
         }

@@ -2,7 +2,7 @@
 
 <section class="min-h-screen lg:h-screen lg:overflow-hidden grid grid-cols-2 max-lg:grid-cols-1">
   <div
-    class="ambient-panel bg-indigo-500 flex justify-center items-center flex-col gap-4 max-lg:hidden lg:h-full"
+    class="ambient-panel bg-night al-dots flex justify-center items-center flex-col gap-4 max-lg:hidden lg:h-full"
   >
     <div
       class="relative w-full max-w-md h-[34rem] max-h-[70vh] cursor-grab active:cursor-grabbing touch-pan-y select-none opacity-0 animate-[fadeUp_0.6s_cubic-bezier(0.16,1,0.3,1)_0.05s_forwards] motion-reduce:animate-none motion-reduce:opacity-100"
@@ -79,7 +79,7 @@
       </div>
     </div>
   </div>
-  <div class="w-full lg:h-full lg:overflow-y-auto">
+  <div class="w-full lg:h-full lg:overflow-y-auto bg-[var(--bg)] text-[var(--ink)]">
    <div class="min-h-full flex flex-col w-full items-center justify-center px-8 py-12">
     <div class="w-full m-auto max-w-sm">
       <img
@@ -87,17 +87,17 @@
         alt="AniverLembre Logo"
         class="w-[8rem] max-h-[32rem] mx-auto opacity-0 animate-[fadeUp_0.6s_cubic-bezier(0.16,1,0.3,1)_0.05s_forwards] motion-reduce:animate-none motion-reduce:opacity-100"
       />
-      <h2 class="text-3xl lg:text-4xl font-bold text-center mt-4 mb-1 opacity-0 animate-[fadeUp_0.6s_cubic-bezier(0.16,1,0.3,1)_0.14s_forwards] motion-reduce:animate-none motion-reduce:opacity-100">
+      <h2 class="font-display text-3xl lg:text-4xl font-bold tracking-tight text-center mt-4 mb-1 opacity-0 animate-[fadeUp_0.6s_cubic-bezier(0.16,1,0.3,1)_0.14s_forwards] motion-reduce:animate-none motion-reduce:opacity-100">
         Crie sua conta
       </h2>
-      <p class="text-gray-500 dark:text-gray-400 text-center text-sm mb-6 opacity-0 animate-[fadeUp_0.6s_cubic-bezier(0.16,1,0.3,1)_0.14s_forwards] motion-reduce:animate-none motion-reduce:opacity-100">
+      <p class="text-[var(--muted)] text-center text-sm mb-6 opacity-0 animate-[fadeUp_0.6s_cubic-bezier(0.16,1,0.3,1)_0.14s_forwards] motion-reduce:animate-none motion-reduce:opacity-100">
         Preencha as informações abaixo!
       </p>
 
       <form method="POST" class="space-y-4 w-full opacity-0 animate-[fadeUp_0.6s_cubic-bezier(0.16,1,0.3,1)_0.22s_forwards] motion-reduce:animate-none motion-reduce:opacity-100">
         {% csrf_token %} {% for field in form %}
         <div class="flex flex-col">
-          <label class="mb-1 font-medium text-sm text-gray-00">
+          <label class="mb-1 font-medium text-sm text-[var(--ink)]">
             {{ field.label }}
           </label>
 
@@ -107,7 +107,7 @@
               name="{{ field.name }}"
               value="{% if field.name != 'password' and field.name != 'confirm_password' %}{{ field.value|default:'' }}{% endif %}"
               placeholder="{% if field.name == 'username' %}Crie um nome de usuário{% elif field.name == 'email' %}Insira seu e-mail{% elif field.name == 'password' %}Insira sua senha{% elif field.name == 'confirm_password' %}Insira sua senha novamente{% elif field.name == 'first_name' %}Insira seu nome{% else %}{{ field.label }}{% endif %}"
-              class="bg-white dark:bg-gray-800 w-full text-black dark:text-white rounded-md border border-gray-200 dark:border-gray-700 px-4 py-3 {% if field.name == 'password' or field.name == 'confirm_password' %}pr-11{% endif %} text-sm transition-colors placeholder:text-gray-500 dark:placeholder:text-gray-500 outline-none focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500 disabled:cursor-not-allowed disabled:opacity-50"
+              class="bg-[var(--field)] w-full text-[var(--ink)] rounded-field border border-[var(--line-field)] px-4 py-3 {% if field.name == 'password' or field.name == 'confirm_password' %}pr-11{% endif %} text-base sm:text-[15px] transition-colors placeholder:text-[var(--muted)] outline-none focus:border-brand focus:shadow-focus disabled:cursor-not-allowed disabled:opacity-50"
               autocomplete="{% if field.name == 'first_name' %}given-name{% elif field.name == 'username' %}username{% elif field.name == 'email' %}email{% elif field.name == 'password' or field.name == 'confirm_password' %}new-password{% endif %}"
               id="{% if field.name == 'password' %}passwordInput{% elif field.name == 'confirm_password' %}confirmPasswordInput{% endif %}"
             />
@@ -116,7 +116,7 @@
               type="button"
               id="togglePassword"
               tabindex="-1"
-              class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-300 transition-colors"
+              class="absolute right-3 top-1/2 -translate-y-1/2 text-[var(--muted)] hover:text-[var(--ink)] transition-colors"
             >
               <span class="material-symbols-outlined text-xl" id="togglePasswordIcon">visibility</span>
             </button>
@@ -125,7 +125,7 @@
               type="button"
               id="toggleConfirmPassword"
               tabindex="-1"
-              class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-300 transition-colors"
+              class="absolute right-3 top-1/2 -translate-y-1/2 text-[var(--muted)] hover:text-[var(--ink)] transition-colors"
             >
               <span class="material-symbols-outlined text-xl" id="toggleConfirmPasswordIcon">visibility</span>
             </button>
@@ -133,7 +133,7 @@
           </div>
 
           {% if field.errors %}
-          <p class="text-red-600 text-sm mt-1">{{ field.errors|striptags }}</p>
+          <p class="text-[var(--danger)] text-sm mt-1">{{ field.errors|striptags }}</p>
           {% endif %}
         </div>
         {% endfor %}
@@ -141,7 +141,7 @@
         <button
           type="submit"
           id="registerBtn"
-          class="w-full bg-indigo-500 hover:bg-indigo-600 text-white py-3 rounded-lg font-semibold transition duration-200 hover:-translate-y-0.5 active:translate-y-0 hover:shadow-[0_10px_20px_-8px_rgba(79,70,229,0.45)] disabled:opacity-70 disabled:cursor-not-allowed disabled:hover:translate-y-0 disabled:hover:shadow-none flex items-center justify-center gap-2 motion-reduce:transition-none motion-reduce:hover:translate-y-0"
+          class="w-full bg-brand hover:bg-brand-hover text-white py-3 rounded-full font-medium shadow-primary transition duration-200 hover:-translate-y-0.5 active:translate-y-0 disabled:opacity-70 disabled:cursor-not-allowed disabled:hover:translate-y-0 flex items-center justify-center gap-2 motion-reduce:transition-none motion-reduce:hover:translate-y-0"
         >
           <span
             class="material-symbols-outlined animate-spin hidden"
@@ -152,11 +152,11 @@
         </button>
       </form>
 
-      <p class="text-center text-sm text-gray-600 dark:text-gray-400 mt-4 opacity-0 animate-[fadeUp_0.6s_cubic-bezier(0.16,1,0.3,1)_0.3s_forwards] motion-reduce:animate-none motion-reduce:opacity-100">
+      <p class="text-center text-sm text-[var(--muted)] mt-4 opacity-0 animate-[fadeUp_0.6s_cubic-bezier(0.16,1,0.3,1)_0.3s_forwards] motion-reduce:animate-none motion-reduce:opacity-100">
         Já tem conta?
         <a
           href="{% url 'accounts:login' %}"
-          class="text-blue-600 dark:text-blue-400 hover:underline font-medium"
+          class="text-[var(--brand-text)] hover:underline font-medium"
         >
           Entrar
         </a>
