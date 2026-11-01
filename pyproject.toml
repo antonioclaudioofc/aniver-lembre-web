@@ -1,0 +1,11 @@
+[tool.ruff]
+line-length = 88
+target-version = "py312"
+extend-exclude = ["migrations", "staticfiles", ".venv"]
+
+[tool.ruff.lint]
+# E/F: erros e pyflakes · I: ordenação de imports · UP: sintaxe moderna
+select = ["E", "F", "I", "UP"]
+
+[tool.ruff.format]
+quote-style = "double"
