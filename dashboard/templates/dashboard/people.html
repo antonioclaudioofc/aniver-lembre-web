@@ -1,0 +1,163 @@
+{% extends "global/base.html" %}
+{% load static %}
+{% block floating_theme %}{% endblock floating_theme %}
+{% block content %}
+
+{% include "partials/_topbar.html" with active="people" modal=True %}
+
+<main class="max-w-app mx-auto px-4 sm:px-8 pt-8 pb-32 sm:pb-16 space-y-6">
+  <header class="flex flex-col sm:flex-row sm:items-end justify-between gap-4">
+    <div>
+      <h1 class="font-display text-3xl sm:text-page font-semibold tracking-tight">Meus aniversariantes</h1>
+      <p class="text-[var(--muted)] mt-1">
+        {{ total_people }} pessoa{{ total_people|pluralize:"s" }} · {{ active_count }} lembrete{{ active_count|pluralize:"s" }} ativo{{ active_count|pluralize:"s" }}
+      </p>
+    </div>
+    <button type="button" data-open-create class="max-sm:hidden inline-flex items-center justify-center gap-2 px-5 h-12 rounded-full bg-brand hover:bg-brand-hover text-white font-medium shadow-primary transition duration-200 hover:-translate-y-0.5 active:translate-y-0">
+      <i data-lucide="plus" class="w-[18px] h-[18px]"></i>
+      Novo aniversário
+    </button>
+  </header>
+
+  <form method="get" action="{% url 'dashboard:people' %}" role="search" class="flex flex-col sm:flex-row gap-3 sm:items-center">
+    <div class="relative flex-1 sm:max-w-md">
+      <i data-lucide="search" class="w-[18px] h-[18px] absolute left-4 top-1/2 -translate-y-1/2 text-[var(--muted)] pointer-events-none"></i>
+      <label for="peopleSearch" class="sr-only">Buscar por nome</label>
+      <input
+        id="peopleSearch"
+        data-search
+        type="search"
+        name="q"
+        value="{{ search_query }}"
+        placeholder="Buscar por nome"
+        autocomplete="off"
+        class="w-full h-12 pl-11 pr-14 rounded-field border border-[var(--line-field)] bg-[var(--field)] text-base sm:text-[15px] text-[var(--ink)] placeholder:text-[var(--muted)] outline-none focus:border-brand focus:shadow-focus"
+      />
+      <kbd class="max-sm:hidden absolute right-3 top-1/2 -translate-y-1/2 text-xs text-[var(--muted)] px-1.5 py-0.5 rounded-md bg-[var(--soft)]">Ctrl K</kbd>
+    </div>
+    <div>
+      <label for="monthSelect" class="sr-only">Filtrar por mês</label>
+      <select
+        id="monthSelect"
+        name="month"
+        onchange="this.form.requestSubmit()"
+        class="w-full sm:w-52 h-12 px-4 rounded-field border border-[var(--line-field)] bg-[var(--field)] text-base sm:text-[15px] text-[var(--ink)] outline-none focus:border-brand focus:shadow-focus"
+      >
+        <option value="">Todos os meses</option>
+        {% for m in month_options %}
+        <option value="{{ m.number }}" {% if selected_month == m.number %}selected{% endif %}>{{ m.label }}{% if m.count %} ({{ m.count }}){% endif %}</option>
+        {% endfor %}
+      </select>
+    </div>
+    {% if search_query or selected_month %}
+    <a href="{% url 'dashboard:people' %}" class="inline-flex items-center justify-center gap-2 px-4 h-12 rounded-full text-[var(--brand-text)] font-medium hover:bg-[var(--soft)] transition-colors">
+      <i data-lucide="filter-x" class="w-4 h-4"></i>
+      Limpar filtros
+    </a>
+    {% endif %}
+  </form>
+
+  {% if page_obj %}
+  <div data-list class="rounded-[28px] bg-[var(--surface)] shadow-outline overflow-hidden">
+    <div class="hidden lg:grid grid-cols-[minmax(0,2.2fr)_minmax(0,1.6fr)_minmax(0,1.4fr)_120px_96px] gap-4 px-6 py-3 text-xs font-semibold uppercase tracking-wide text-[var(--muted)] border-b border-[var(--line)]">
+      <span>Nome</span>
+      <span>Aniversário</span>
+      <span>Aviso</span>
+      <span>Faltam</span>
+      <span class="text-right">Ações</span>
+    </div>
+
+    <ul class="divide-y divide-[var(--line)]">
+      {% for r in reminders %}
+      <li
+        data-reminder-row="{{ r.id }}"
+        data-name="{{ r.contact.name }}"
+        class="grid grid-cols-[minmax(0,1fr)_auto] lg:grid-cols-[minmax(0,2.2fr)_minmax(0,1.6fr)_minmax(0,1.4fr)_120px_96px] items-center gap-x-4 gap-y-2 px-4 sm:px-6 py-4 {% if not r.active %}bg-[var(--soft)]/50{% endif %}"
+      >
+        <div class="flex items-center gap-3 min-w-0">
+          {% include "components/_avatar.html" with tone=r.tone name=r.contact.name size=40 %}
+          <div class="min-w-0">
+            <p class="font-semibold truncate {% if not r.active %}text-[var(--muted)]{% endif %}">{{ r.contact.name }}</p>
+            <p class="text-sm text-[var(--muted)] truncate">{{ r.contact.relationship|default:"Sem parentesco" }}{% if not r.active %} · pausado{% endif %}</p>
+          </div>
+        </div>
+
+        <div class="flex items-center justify-end lg:justify-start gap-1.5 lg:order-last">
+          <button
+            type="button"
+            data-edit-reminder
+            {% include "dashboard/_edit_attrs.html" %}
+            title="Editar"
+            aria-label="Editar aniversário de {{ r.contact.name }}"
+            class="w-11 h-11 sm:w-10 sm:h-10 flex items-center justify-center rounded-full border border-[var(--line-field)] text-[var(--muted)] hover:border-brand hover:text-[var(--brand-text)] hover:bg-[var(--brand-tint)] transition-colors"
+          >
+            <i data-lucide="pencil" class="w-[18px] h-[18px]"></i>
+          </button>
+          <form
+            method="post"
+            action="{% url 'dashboard:delete_reminder' r.id %}"
+            data-delete-form
+            data-name="{{ r.contact.name }}"
+          >
+            {% csrf_token %}
+            <input type="hidden" name="page" value="{{ page_obj.number }}" />
+            <input type="hidden" name="next" value="people" />
+            <button
+              type="submit"
+              title="Excluir"
+              aria-label="Excluir lembrete de {{ r.contact.name }}"
+              class="w-11 h-11 sm:w-10 sm:h-10 flex items-center justify-center rounded-full border border-[var(--line-field)] text-[var(--danger)] hover:border-[var(--danger)] transition-colors"
+            >
+              <i data-lucide="trash-2" class="w-[18px] h-[18px]"></i>
+            </button>
+          </form>
+        </div>
+
+        <div class="col-span-2 flex flex-wrap items-center gap-x-6 gap-y-2 lg:contents text-sm">
+          <div class="lg:order-none">
+            <p class="font-display font-semibold text-base">{{ r.contact.birthday|date:"d/m/Y" }}</p>
+            <p class="text-[var(--muted)]">{% if r.turning_age is not None %}faz {{ r.turning_age }} ano{{ r.turning_age|pluralize:"s" }}{% endif %}</p>
+          </div>
+          <div class="text-[var(--muted)]">
+            <p class="flex items-center gap-1.5">
+              <i data-lucide="bell-ring" class="w-4 h-4 text-[var(--brand-text)]"></i>
+              {{ r.notify_at|time:"H:i" }}
+            </p>
+            <p>{% if r.days_before == 0 %}No dia{% else %}{{ r.days_before }} dia{{ r.days_before|pluralize:"s" }} antes{% endif %}</p>
+          </div>
+          <div>
+            {% if not r.active %}
+            <span class="inline-flex items-center px-3 h-7 rounded-full text-xs font-semibold bg-[var(--soft)] text-[var(--muted)]">pausado</span>
+            {% elif r.days_until_birthday is None %}
+            <span class="text-[var(--muted)]">—</span>
+            {% elif r.days_until_birthday == 0 %}
+            <span class="inline-flex items-center px-3 h-7 rounded-full text-xs font-semibold bg-confetti-coral text-[#1C1B2E]">hoje</span>
+            {% elif r.days_until_birthday <= 14 %}
+            <span class="inline-flex items-center px-3 h-7 rounded-full text-xs font-semibold bg-night text-white">{{ r.days_until_birthday }} dia{{ r.days_until_birthday|pluralize:"s" }}</span>
+            {% elif r.days_until_birthday <= 45 %}
+            <span class="inline-flex items-center px-3 h-7 rounded-full text-xs font-semibold bg-[var(--brand-tint)] text-[var(--brand-text)]">{{ r.days_until_birthday }} dias</span>
+            {% else %}
+            <span class="inline-flex items-center px-3 h-7 rounded-full text-xs font-semibold bg-[var(--soft)] text-[var(--muted)]">{{ r.days_until_birthday }} dias</span>
+            {% endif %}
+          </div>
+        </div>
+      </li>
+      {% endfor %}
+    </ul>
+  </div>
+
+  {% include "components/_pagination.html" %}
+
+  {% else %}
+  {% url 'dashboard:people' as clear_url %}
+  {% if search_query or selected_month %}
+  {% include "components/_empty_state.html" with title="Nenhum aniversariante encontrado" text="Tente outro nome ou mês." action_url=clear_url action_label="Limpar filtros" %}
+  {% else %}
+  {% include "components/_empty_state.html" with title="Nenhum aniversário cadastrado" text="Cadastre o primeiro e receba um aviso antes da data." action_button="Novo aniversário" %}
+  {% endif %}
+  {% endif %}
+</main>
+
+{% include "dashboard/_reminder_modal.html" %}
+
+{% endblock content %}

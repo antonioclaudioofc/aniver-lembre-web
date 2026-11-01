@@ -1,0 +1,1 @@
+data-reminder-id="{{ r.id }}" data-name="{{ r.contact.name }}" data-birthday="{{ r.contact.birthday|date:'Y-m-d' }}" data-relationship="{{ r.contact.relationship|default_if_none:'' }}" data-notes="{{ r.contact.notes|default_if_none:'' }}" data-days-before="{{ r.days_before }}" data-notify-at="{{ r.notify_at|time:'H:i' }}" data-active="{{ r.active }}"

@@ -1,0 +1,427 @@
+<dialog
+  id="createDialog"
+  aria-labelledby="dialogTitle"
+  class="rounded-[28px] max-w-2xl w-5/6 p-0 bg-transparent backdrop:bg-[#262163]/50 backdrop:backdrop-blur-sm m-auto max-sm:m-0 max-sm:w-full max-sm:max-w-none max-sm:h-full max-sm:max-h-none max-sm:rounded-none"
+>
+  <div
+    id="createDialogPanel"
+    class="bg-[var(--surface)] text-[var(--ink)] rounded-[28px] shadow-modal opacity-0 scale-95 transition-all duration-200 motion-reduce:transition-none motion-reduce:opacity-100 motion-reduce:scale-100 max-h-[85vh] max-sm:max-h-none max-sm:min-h-full max-sm:rounded-none overflow-y-auto"
+  >
+    <div class="relative overflow-hidden bg-night al-dots rounded-t-[28px] max-sm:rounded-none px-6 pt-5 pb-6 text-white">
+      <span class="al-confetti" style="width: 10px; height: 10px; top: 18px; right: 90px; background: var(--coral)"></span>
+      <span class="al-confetti" style="width: 7px; height: 7px; top: 54px; right: 44px; background: var(--honey)"></span>
+      <span class="al-confetti" style="width: 8px; height: 8px; bottom: 16px; right: 130px; background: var(--mint)"></span>
+      <div class="relative flex items-start justify-between gap-3">
+        <h3 class="font-display text-2xl font-semibold tracking-tight" id="dialogTitle">{% if is_editing %}Editar aniversário{% else %}Novo aniversário{% endif %}</h3>
+        <button
+          id="closeCreateDialog"
+          type="button"
+          aria-label="Fechar"
+          class="w-11 h-11 -mr-2 -mt-2 flex items-center justify-center rounded-full text-[var(--on-night)] hover:text-white hover:bg-white/10 transition-colors"
+        >
+          <i data-lucide="x" class="w-5 h-5"></i>
+        </button>
+      </div>
+      <div class="relative flex items-center gap-4 mt-4">
+        {% include "components/_date_stamp.html" with size=72 month="—" day="?" %}
+        <p id="stampPhrase" class="text-[var(--on-night)] leading-snug" aria-live="polite">Preencha o nome e a data de nascimento.</p>
+      </div>
+    </div>
+
+    <form
+      method="post"
+      action="{% url 'dashboard:create_reminder' %}"
+      class="px-6 pt-5 pb-0 space-y-5"
+    >
+      {% csrf_token %}
+      <input type="hidden" name="reminder_id" id="reminderIdField" value="{{ current_reminder_id|default:'' }}" />
+      <input type="hidden" name="page" value="{{ page_obj.number }}" />
+      <input type="hidden" name="next" value="{{ modal_next }}" />
+
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        <div class="flex flex-col sm:col-span-2">
+          <label for="{{ contact_form.name.id_for_label }}" class="mb-1.5 font-medium text-sm">{{ contact_form.name.label }} *</label>
+          {{ contact_form.name }}
+          {% for error in contact_form.name.errors %}<p class="text-[var(--danger)] text-sm mt-1">{{ error }}</p>{% endfor %}
+        </div>
+
+        <div class="flex flex-col">
+          <label for="{{ contact_form.birthday.id_for_label }}" class="mb-1.5 font-medium text-sm">Nascimento *</label>
+          {{ contact_form.birthday }}
+          {% for error in contact_form.birthday.errors %}<p class="text-[var(--danger)] text-sm mt-1">{{ error }}</p>{% endfor %}
+        </div>
+
+        <div class="flex flex-col">
+          <label for="{{ contact_form.relationship.id_for_label }}" class="mb-1.5 font-medium text-sm">Parentesco <span class="text-[var(--muted)] font-normal">(opcional)</span></label>
+          {{ contact_form.relationship }}
+          {% for error in contact_form.relationship.errors %}<p class="text-[var(--danger)] text-sm mt-1">{{ error }}</p>{% endfor %}
+        </div>
+      </div>
+
+      <div class="grid grid-cols-1 sm:grid-cols-5 gap-4">
+        <div class="flex flex-col sm:col-span-3">
+          <span id="whenLabel" class="mb-1.5 font-medium text-sm">Quando avisar *</span>
+          <div id="whenSegment" class="al-segment" role="radiogroup" aria-labelledby="whenLabel"></div>
+          <div class="sr-only">
+            <label for="{{ reminder_form.days_before.id_for_label }}">{{ reminder_form.days_before.label }}</label>
+            {{ reminder_form.days_before }}
+          </div>
+          {% for error in reminder_form.days_before.errors %}<p class="text-[var(--danger)] text-sm mt-1">{{ error }}</p>{% endfor %}
+        </div>
+
+        <div class="flex flex-col sm:col-span-2">
+          <label for="{{ reminder_form.notify_at.id_for_label }}" class="mb-1.5 font-medium text-sm">Horário *</label>
+          {{ reminder_form.notify_at }}
+          {% for error in reminder_form.notify_at.errors %}<p class="text-[var(--danger)] text-sm mt-1">{{ error }}</p>{% endfor %}
+        </div>
+      </div>
+
+      <p id="notifyLine" class="flex items-center gap-2 text-sm text-[var(--muted)]" aria-live="polite">
+        <i data-lucide="bell-ring" class="w-4 h-4 text-[var(--brand-text)]"></i>
+        <span id="notifyText">O aviso será calculado quando você escolher a data.</span>
+      </p>
+
+      <details id="extraDetails" class="group rounded-2xl bg-[var(--soft)]" {% if show_dialog and contact_form.notes.errors or show_dialog and reminder_form.active.errors %}open{% endif %}>
+        <summary class="flex items-center justify-between gap-3 px-4 min-h-12 cursor-pointer select-none font-medium text-sm list-none [&::-webkit-details-marker]:hidden">
+          <span>Observações e status</span>
+          <i data-lucide="chevron-down" class="w-4 h-4 text-[var(--muted)] transition-transform group-open:rotate-180"></i>
+        </summary>
+        <div class="px-4 pb-4 space-y-4">
+          <div class="flex flex-col">
+            <label for="{{ contact_form.notes.id_for_label }}" class="mb-1.5 font-medium text-sm">{{ contact_form.notes.label }}</label>
+            {{ contact_form.notes }}
+            {% for error in contact_form.notes.errors %}<p class="text-[var(--danger)] text-sm mt-1">{{ error }}</p>{% endfor %}
+          </div>
+          <div class="flex items-center justify-between gap-3 px-4 py-3 rounded-2xl bg-[var(--surface)] shadow-outline">
+            <label for="{{ reminder_form.active.id_for_label }}" class="text-sm font-medium cursor-pointer flex flex-col">
+              {{ reminder_form.active.label }}
+              <span class="text-[var(--muted)] font-normal">Pausado, o aviso por e-mail não é enviado.</span>
+            </label>
+            {{ reminder_form.active }}
+          </div>
+          {% for error in reminder_form.active.errors %}<p class="text-[var(--danger)] text-sm">{{ error }}</p>{% endfor %}
+        </div>
+      </details>
+
+      <div class="sticky bottom-0 -mx-6 px-6 py-4 bg-[var(--surface)] border-t border-[var(--line)] flex justify-end max-sm:justify-stretch gap-3">
+        <button
+          type="button"
+          id="cancelCreate"
+          class="px-6 h-12 rounded-full bg-[var(--soft)] text-[var(--ink)] font-medium hover:brightness-95 transition max-sm:flex-1"
+        >
+          Cancelar
+        </button>
+        <button
+          type="submit"
+          id="saveReminderBtn"
+          class="px-6 h-12 rounded-full bg-brand hover:bg-brand-hover text-white font-medium shadow-primary transition duration-200 hover:-translate-y-0.5 active:translate-y-0 flex items-center justify-center gap-2 disabled:opacity-70 disabled:cursor-not-allowed disabled:hover:translate-y-0 motion-reduce:transition-none motion-reduce:hover:translate-y-0 max-sm:flex-1"
+        >
+          <span id="saveSpinner" class="hidden"><i data-lucide="loader-circle" class="w-4 h-4 animate-spin"></i></span>
+          <span id="saveText">{% if is_editing %}Atualizar{% else %}Salvar aniversário{% endif %}</span>
+        </button>
+      </div>
+    </form>
+  </div>
+</dialog>
+
+<dialog
+  id="deleteDialog"
+  aria-labelledby="deleteDialogTitle"
+  class="rounded-[28px] max-w-md w-5/6 p-0 bg-transparent backdrop:bg-[#262163]/50 backdrop:backdrop-blur-sm m-auto"
+>
+  <div class="bg-[var(--surface)] text-[var(--ink)] rounded-[28px] shadow-modal p-6 space-y-5">
+    <div class="space-y-2">
+      <h3 id="deleteDialogTitle" class="font-display text-2xl font-semibold tracking-tight">
+        Excluir lembrete de <span id="deleteName"></span>?
+      </h3>
+      <p class="text-[var(--muted)]">Essa ação não pode ser desfeita.</p>
+    </div>
+    <div class="flex justify-end gap-3">
+      <button type="button" id="cancelDelete" class="px-6 h-12 rounded-full bg-[var(--soft)] text-[var(--ink)] font-medium hover:brightness-95 transition">Cancelar</button>
+      <button type="button" id="confirmDelete" class="px-6 h-12 rounded-full bg-[var(--danger)] text-white font-medium hover:brightness-110 transition">Excluir</button>
+    </div>
+  </div>
+</dialog>
+
+<script>
+  (function () {
+    var MONTHS = ['JAN', 'FEV', 'MAR', 'ABR', 'MAI', 'JUN', 'JUL', 'AGO', 'SET', 'OUT', 'NOV', 'DEZ'];
+    var PRESETS = [[0, 'No dia'], [1, '1 dia'], [3, '3 dias'], [7, '1 semana']];
+
+    var dialog = document.getElementById('createDialog');
+    var panel = document.getElementById('createDialogPanel');
+    var reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+    var nameEl = document.getElementById('id_name');
+    var birthdayEl = document.getElementById('id_birthday');
+    var daysEl = document.getElementById('id_days_before');
+    var timeEl = document.getElementById('id_notify_at');
+    var activeEl = document.getElementById('id_active');
+    var segment = document.getElementById('whenSegment');
+    var phrase = document.getElementById('stampPhrase');
+    var notifyText = document.getElementById('notifyText');
+    var details = document.getElementById('extraDetails');
+
+    var form = dialog.querySelector('form');
+    var saveBtn = document.getElementById('saveReminderBtn');
+    var saveSpinner = document.getElementById('saveSpinner');
+    var saveText = document.getElementById('saveText');
+    var titleEl = document.getElementById('dialogTitle');
+    var idField = document.getElementById('reminderIdField');
+    var lastOpener = null;
+
+    if (activeEl) activeEl.setAttribute('role', 'switch');
+    if (daysEl) daysEl.setAttribute('tabindex', '-1');
+
+    function pad(n) { return n < 10 ? '0' + n : '' + n; }
+
+    function parseDate(value) {
+      var m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(value || '');
+      if (!m) return null;
+      return { y: +m[1], m: +m[2], d: +m[3] };
+    }
+
+    function nextOccurrence(b) {
+      var today = new Date();
+      today = new Date(today.getFullYear(), today.getMonth(), today.getDate());
+      for (var y = today.getFullYear(); y < today.getFullYear() + 9; y++) {
+        var occ = new Date(y, b.m - 1, b.d);
+        if (occ.getMonth() !== b.m - 1) continue;
+        if (occ >= today) return { date: occ, today: today };
+      }
+      return null;
+    }
+
+    function firstName() {
+      var v = (nameEl.value || '').trim();
+      return v ? v.split(/\s+/)[0] : '';
+    }
+
+    function renderSegment() {
+      var current = daysEl.value === '' ? null : parseInt(daysEl.value, 10);
+      var options = PRESETS.slice();
+      if (current !== null && !isNaN(current) && !PRESETS.some(function (p) { return p[0] === current; })) {
+        options.push([current, current + (current === 1 ? ' dia' : ' dias')]);
+      }
+      segment.innerHTML = '';
+      options.forEach(function (opt, i) {
+        var b = document.createElement('button');
+        b.type = 'button';
+        b.setAttribute('role', 'radio');
+        var checked = current === opt[0];
+        b.setAttribute('aria-checked', checked ? 'true' : 'false');
+        b.tabIndex = checked || (current === null && i === 0) ? 0 : -1;
+        b.textContent = opt[1];
+        b.dataset.value = opt[0];
+        b.addEventListener('click', function () {
+          daysEl.value = opt[0];
+          renderSegment();
+          preview();
+        });
+        b.addEventListener('keydown', function (e) {
+          if (e.key !== 'ArrowRight' && e.key !== 'ArrowLeft') return;
+          e.preventDefault();
+          var items = Array.prototype.slice.call(segment.children);
+          var idx = items.indexOf(b) + (e.key === 'ArrowRight' ? 1 : -1);
+          idx = (idx + items.length) % items.length;
+          items[idx].click();
+          segment.children[idx].focus();
+        });
+        segment.appendChild(b);
+      });
+    }
+
+    function setStamp(m, d) {
+      dialog.querySelector('[data-stamp-month]').textContent = m;
+      dialog.querySelector('[data-stamp-day]').textContent = d;
+    }
+
+    function preview() {
+      var b = parseDate(birthdayEl.value);
+      var who = firstName();
+      if (!b) {
+        setStamp('—', '?');
+        phrase.textContent = 'Preencha o nome e a data de nascimento.';
+        notifyText.textContent = 'O aviso será calculado quando você escolher a data.';
+        return;
+      }
+      setStamp(MONTHS[b.m - 1], b.d);
+      var occ = nextOccurrence(b);
+      if (!occ) {
+        phrase.textContent = (who || 'Essa pessoa') + ' nasceu em ' + pad(b.d) + '/' + pad(b.m) + '/' + b.y + '.';
+        notifyText.textContent = '';
+        return;
+      }
+      var age = occ.date.getFullYear() - b.y;
+      var days = Math.round((occ.date - occ.today) / 86400000);
+      var when = days === 0 ? 'hoje' : days === 1 ? 'amanhã' : 'em ' + days + ' dias';
+      phrase.textContent = (who || 'Essa pessoa') + ' faz ' + age + (age === 1 ? ' ano ' : ' anos ') + when + '.';
+
+      var before = parseInt(daysEl.value, 10);
+      if (isNaN(before)) { notifyText.textContent = ''; return; }
+      var notifyDate = new Date(occ.date);
+      notifyDate.setDate(notifyDate.getDate() - before);
+      var time = timeEl.value || '09:00';
+      notifyText.textContent = 'Aviso por e-mail em ' + pad(notifyDate.getDate()) + '/' + pad(notifyDate.getMonth() + 1) + ' às ' + time + '.';
+    }
+
+    function open(opener) {
+      lastOpener = opener || document.activeElement;
+      dialog.showModal();
+      renderSegment();
+      preview();
+      requestAnimationFrame(function () {
+        requestAnimationFrame(function () {
+          panel.classList.remove('opacity-0', 'scale-95');
+          panel.classList.add('opacity-100', 'scale-100');
+        });
+      });
+      nameEl.focus();
+    }
+
+    function close() {
+      if (!reducedMotion) {
+        panel.classList.remove('opacity-100', 'scale-100');
+        panel.classList.add('opacity-0', 'scale-95');
+        setTimeout(function () { dialog.close(); }, 180);
+      } else {
+        dialog.close();
+      }
+    }
+
+    dialog.addEventListener('close', function () {
+      panel.classList.remove('opacity-100', 'scale-100');
+      panel.classList.add('opacity-0', 'scale-95');
+      if (lastOpener && typeof lastOpener.focus === 'function') lastOpener.focus();
+    });
+
+    function resetToCreate() {
+      titleEl.textContent = 'Novo aniversário';
+      saveText.textContent = 'Salvar aniversário';
+      idField.value = '';
+      nameEl.value = '';
+      birthdayEl.value = '';
+      document.getElementById('id_relationship').value = '';
+      document.getElementById('id_notes').value = '';
+      daysEl.value = '1';
+      timeEl.value = '09:00';
+      if (activeEl) activeEl.checked = true;
+      if (details) details.open = false;
+    }
+
+    document.addEventListener('click', function (e) {
+      var edit = e.target.closest('[data-edit-reminder]');
+      if (edit) {
+        var d = edit.dataset;
+        titleEl.textContent = 'Editar aniversário';
+        saveText.textContent = 'Atualizar';
+        idField.value = d.reminderId || '';
+        nameEl.value = d.name || '';
+        birthdayEl.value = d.birthday || '';
+        document.getElementById('id_relationship').value = d.relationship || '';
+        document.getElementById('id_notes').value = d.notes || '';
+        daysEl.value = d.daysBefore || '1';
+        timeEl.value = d.notifyAt || '09:00';
+        if (activeEl) activeEl.checked = (d.active || 'false').toString().toLowerCase() === 'true';
+        if (details) details.open = !!(d.notes);
+        open(edit);
+        return;
+      }
+      var creator = e.target.closest('#openCreateDialog, [data-open-create]');
+      if (creator) {
+        resetToCreate();
+        open(creator);
+      }
+    });
+
+    document.getElementById('closeCreateDialog').addEventListener('click', function (e) {
+      e.preventDefault();
+      close();
+    });
+    document.getElementById('cancelCreate').addEventListener('click', function (e) {
+      e.preventDefault();
+      close();
+    });
+
+    [nameEl, birthdayEl, timeEl].forEach(function (el) {
+      el.addEventListener('input', preview);
+      el.addEventListener('change', preview);
+    });
+    daysEl.addEventListener('input', function () { renderSegment(); preview(); });
+
+    form.addEventListener('submit', function () {
+      saveBtn.disabled = true;
+      saveSpinner.classList.remove('hidden');
+      saveText.textContent = 'Salvando…';
+    });
+
+    {% if show_dialog %}
+    setTimeout(function () { open(null); }, 100);
+    {% endif %}
+
+    var deleteDialog = document.getElementById('deleteDialog');
+    var deleteName = document.getElementById('deleteName');
+    var pendingDelete = null;
+
+    document.querySelectorAll('[data-delete-form]').forEach(function (f) {
+      f.addEventListener('submit', function (e) {
+        if (f.dataset.confirmed === '1') return;
+        e.preventDefault();
+        pendingDelete = f;
+        deleteName.textContent = f.dataset.name;
+        deleteDialog.showModal();
+      });
+    });
+
+    document.getElementById('cancelDelete').addEventListener('click', function () {
+      pendingDelete = null;
+      deleteDialog.close();
+    });
+    document.getElementById('confirmDelete').addEventListener('click', function () {
+      if (!pendingDelete) return;
+      pendingDelete.dataset.confirmed = '1';
+      pendingDelete.submit();
+    });
+
+    var params = new URLSearchParams(window.location.search);
+
+    if (params.get('new') === '1') {
+      params.delete('new');
+      resetToCreate();
+      setTimeout(function () { open(null); }, 100);
+    }
+
+    var toasts = {
+      email_verified: ['E-mail confirmado com sucesso! Bem-vindo(a).', 'success'],
+      reminder_created: [null, 'success'],
+      reminder_updated: [null, 'success'],
+      reminder_deleted: ['Lembrete excluído com sucesso!', 'success'],
+    };
+    var found = Object.keys(toasts).find(function (k) { return params.get(k) === '1'; });
+    if (found) {
+      var message = toasts[found][0];
+      var action = null;
+      var savedId = params.get('saved');
+      var row = savedId ? document.querySelector('[data-reminder-row="' + savedId + '"]') : null;
+      if (!message) {
+        var label = row ? row.dataset.name : '';
+        message = label ? 'Aniversário de ' + label + ' salvo' : 'Aniversário salvo';
+        if (row) {
+          action = {
+            label: 'Ver',
+            onClick: function () {
+              row.scrollIntoView({ behavior: reducedMotion ? 'auto' : 'smooth', block: 'center' });
+              row.classList.add('al-flash');
+            },
+          };
+        }
+      }
+      window.showAppToast(message, toasts[found][1], action);
+    }
+    ['reminder_created', 'reminder_updated', 'reminder_deleted', 'email_verified', 'saved'].forEach(function (k) {
+      params.delete(k);
+    });
+    var qs = params.toString();
+    window.history.replaceState({}, '', window.location.pathname + (qs ? '?' + qs : ''));
+  })();
+</script>

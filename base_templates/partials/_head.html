@@ -16,10 +16,6 @@
 <link rel="alternate icon" type="image/png" href="{% static 'images/favicon.png' %}" />
 <script src="https://cdn.tailwindcss.com"></script>
 <script src="{% static 'js/tailwind.config.js' %}"></script>
-<link
-  href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined"
-  rel="stylesheet"
-/>
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 <link
@@ -32,33 +28,70 @@
   href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css"
 />
 <script src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
+<script src="https://unpkg.com/lucide@0.460.0/dist/umd/lucide.min.js"></script>
 <script>
-  window.showAppToast = function (message, type) {
+  window.toggleEye = function (el, showing) {
+    if (!el) return;
+    var c = el.children;
+    if (c.length < 2) return;
+    c[0].classList.toggle('hidden', !showing);
+    c[1].classList.toggle('hidden', showing);
+  };
+
+  window.showAppToast = function (message, type, action) {
     var palette = {
-      success: '!bg-emerald-600',
-      danger: '!bg-red-600',
-      warning: '!bg-amber-500',
-      info: '!bg-indigo-600',
+      success: ['#3CCFAE', '✓'],
+      danger: ['#FF7A59', '!'],
+      warning: ['#FFC857', '!'],
+      info: ['#A9A6FF', 'i'],
     };
-    var colorClass = palette[type] || palette.info;
+    var tone = palette[type] || palette.info;
 
     if (window.__appToast) {
       window.__appToast.hideToast();
     }
 
+    var node = document.createElement('div');
+    node.style.cssText = 'display:flex;align-items:center;gap:12px';
+
+    var icon = document.createElement('span');
+    icon.textContent = tone[1];
+    icon.setAttribute('aria-hidden', 'true');
+    icon.style.cssText =
+      'display:inline-flex;align-items:center;justify-content:center;width:22px;height:22px;border-radius:999px;font-size:13px;font-weight:700;color:#1C1B2E;flex-shrink:0;background:' +
+      tone[0];
+
+    var text = document.createElement('span');
+    text.textContent = message;
+
+    node.appendChild(icon);
+    node.appendChild(text);
+
+    if (action && action.label) {
+      var btn = document.createElement('button');
+      btn.type = 'button';
+      btn.textContent = action.label;
+      btn.style.cssText =
+        'margin-left:4px;font-weight:600;text-decoration:underline;color:inherit';
+      btn.addEventListener('click', function () {
+        if (action.onClick) action.onClick();
+        if (window.__appToast) window.__appToast.hideToast();
+      });
+      node.appendChild(btn);
+    }
+
     window.__appToast = Toastify({
-      text: message,
-      duration: 1500,
+      node: node,
+      duration: action ? 5000 : 2500,
       gravity: 'top',
       position: 'right',
       close: true,
-      className:
-        '!bg-none ' +
-        colorClass +
-        ' !text-white !rounded-xl !shadow-2xl !px-4 !py-3 !font-medium',
+      className: 'al-toast',
       stopOnFocus: true,
+      ariaLive: 'polite',
     });
     window.__appToast.showToast();
   };
 </script>
+<script defer src="{% static 'js/app.js' %}"></script>
 <title>Aniver Lembre</title>
